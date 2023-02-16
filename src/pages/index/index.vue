@@ -9,6 +9,8 @@ import {
   BannerItem,
   getHomeCategoryMutli,
   CategoryItem,
+  getHomeHotMutli,
+  HotItem,
 } from "@/apis/home";
 
 // pinia
@@ -36,10 +38,12 @@ const nextVersion = () => {
 // -----------------------
 const bannerList = ref<BannerItem[]>([]);
 const categoryList = ref<CategoryItem[]>([]);
+const hotList = ref<HotItem[]>([]);
 //通过封装的 http通用函数发请求
 const loadData = async () => {
   bannerList.value = await getHomeBanner();
   categoryList.value = await getHomeCategoryMutli();
+  hotList.value = await getHomeHotMutli();
 };
 loadData();
 </script>
@@ -76,67 +80,24 @@ loadData();
     <entries :source="categoryList"></entries>
     <!-- 推荐专区 -->
     <view class="panel recommend">
-      <view class="item">
-        <view class="title">特惠推荐<text>精选全攻略</text></view>
+      <view class="item" v-for="item in hotList" :key="item.id">
+        <view class="title"
+          >{{ item.title }}<text>{{ item.alt }}</text></view
+        >
         <navigator
           hover-class="none"
-          url="/pages/recommend/index?type=1"
+          :url="`/pages/recommend/index?type=${item.id}`"
           class="cards"
         >
           <image
             mode="aspectFit"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_small_1.jpg"
+            v-for="img in item.pictures"
+            :key="img"
+            :src="img"
           ></image>
           <image
             mode="aspectFit"
             src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_small_2.jpg"
-          ></image>
-        </navigator>
-      </view>
-      <view class="item">
-        <view class="title">爆款推荐<text>最受欢迎</text></view>
-        <navigator
-          hover-class="none"
-          url="/pages/recommend/index?type=2"
-          class="cards"
-        >
-          <image
-            mode="aspectFit"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_small_3.jpg"
-          ></image>
-          <image
-            mode="aspectFit"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_small_4.jpg"
-          ></image>
-        </navigator>
-      </view>
-      <view class="item">
-        <view class="title">一站买全 <text>精选优选</text></view>
-        <navigator
-          hover-class="none"
-          url="/pages/recommend/index?type=1"
-          class="cards"
-        >
-          <image
-            mode="aspectFit"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_small_5.jpg"
-          ></image>
-          <image
-            mode="aspectFit"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_small_6.jpg"
-          ></image>
-        </navigator>
-      </view>
-      <view class="item" @tap="nextVersion">
-        <view class="title"> 领券中心 <text>超值优惠券</text> </view>
-        <navigator hover-class="none" class="cards">
-          <image
-            mode="aspectFit"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_small_7.jpg"
-          ></image>
-          <image
-            mode="aspectFit"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_small_8.jpg"
           ></image>
         </navigator>
       </view>

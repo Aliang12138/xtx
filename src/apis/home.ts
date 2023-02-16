@@ -23,7 +23,7 @@ export function getHomeBanner(distributionSite = 1) {
 }
 
 /**
- * 数据
+ * 前台分类数据
  */
 export interface CategoryItem {
   /**
@@ -45,5 +45,38 @@ export function getHomeCategoryMutli() {
   return http<CategoryItem[]>({
     method: "GET",
     url: "/home/category/mutli",
+  });
+}
+
+/**
+ * 热门推荐数据信息
+ */
+export interface HotItem {
+  /**
+   * 说明
+   */
+  alt: string;
+  /**
+   * id
+   */
+  id: string;
+  /**
+   * 图片集合
+   */
+  pictures: string[];
+  /**
+   * 跳转地址
+   */
+  target: string;
+  /**
+   * 标题
+   */
+  title: string;
+}
+//热门推荐
+export function getHomeHotMutli() {
+  return http<HotItem[]>({
+    method: "GET",
+    url: "/home/hot/mutli",
   });
 }
