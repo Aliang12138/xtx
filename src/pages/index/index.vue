@@ -55,7 +55,9 @@ const loadData = async () => {
 };
 loadData();
 
+//全局页码变量
 let page = 1;
+const counts = ref(0);
 //猜你喜欢需要调用多次
 const getGuessList = async () => {
   // 调用接口;
@@ -63,10 +65,15 @@ const getGuessList = async () => {
   // console.log(res);
   //追加分页数据
   guessLikeList.value.push(...res.items);
+  //保存总条数,用于判断是否加载完毕
+  counts.value = res.counts;
 };
 
 //滚动到底部时触发
 const onScrolltolower = () => {
+  if (counts.value === guessLikeList.value.length) {
+    return uni.showToast({ icon: "none", title: "没有更多" });
+  }
   //页码自增
   page++;
   getGuessList();
@@ -230,7 +237,9 @@ const onScrolltolower = () => {
     </view>
     <!-- 猜你喜欢 -->
     <guess :source="guessLikeList"></guess>
-    <view class="loading" v-if="hasMore">正在加载...</view>
+    <view class="loading" v-if="counts !== guessLikeList.length"
+      >正在加载...</view
+    >
   </scroll-view>
 </template>
 
