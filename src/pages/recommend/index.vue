@@ -2,7 +2,7 @@
 import { reactive, ref } from "vue";
 
 import { onLoad } from "@dcloudio/uni-app";
-import { getHotInVogue, getHotPreference, SubType } from "@/apis/home";
+import { getHotRecommend, SubType } from "@/apis/home";
 
 interface metaType {
   title: string;
@@ -52,22 +52,30 @@ uni.setNavigationBarTitle({
 //-----------------------------------------
 const bannerPicture = ref("");
 const subTypes = ref<SubType[]>([]);
+const urlMap = [
+  { type: "1", url: "/hot/preference" },
+  { type: "2", url: "/hot/inVogue" },
+  { type: "3", url: "/hot/oneStop" },
+  { type: "4", url: "/hot/preference" },
+  { type: "5", url: "/hot/new" },
+];
 onLoad(async ({ type }) => {
-  if (type === "1") {
-    const res = await getHotPreference({});
+  const currUrlMap = urlMap.find((v) => v.type === type);
+  if (currUrlMap) {
+    const res = await getHotRecommend(currUrlMap.url, {});
     //动态更新导航栏标题
     uni.setNavigationBarTitle({ title: res.title });
     //保存轮播图
     bannerPicture.value = res.bannerPicture;
     //保存tabs数据
     subTypes.value = res.subTypes;
-  } else if (type === "2") {
-    const res = await getHotInVogue({});
-    uni.setNavigationBarTitle({ title: res.title });
-    bannerPicture.value = res.bannerPicture;
-    subTypes.value = res.subTypes;
   }
 });
+
+const activeIndex = ref(0);
+const changeTabs = (index: number) => {
+  activeIndex.value = index;
+};
 </script>
 
 <template>
@@ -81,7 +89,8 @@ onLoad(async ({ type }) => {
         class="text"
         v-for="(item, index) in subTypes"
         :key="item.id"
-        :class="{ active: index === 0 }"
+        :class="{ active: index === activeIndex }"
+        @tap="changeTabs(index)"
         >{{ item.title }}</text
       >
     </view>

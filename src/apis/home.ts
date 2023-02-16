@@ -296,20 +296,11 @@ export interface Item {
   price: number;
 }
 
-//特惠推荐
-export function getHotPreference(data: RecommendData) {
+//推荐通用api
+export function getHotRecommend(url: string, data: RecommendData) {
   return http<RecommendResult>({
     method: "GET",
-    url: "/hot/preference",
-    data: data,
-  });
-}
-
-//爆款推荐
-export function getHotInVogue(data: RecommendData) {
-  return http<RecommendResult>({
-    method: "GET",
-    url: "/hot/inVogue",
+    url: url,
     data: data,
   });
 }
