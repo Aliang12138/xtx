@@ -147,7 +147,7 @@ const onRefresherrefresh = async () => {
         >
         <navigator
           hover-class="none"
-          :url="`/pages/recommend/index?type=${item.id}`"
+          :url="`/pages/recommend/index?type=${item.type}`"
           class="cards"
         >
           <image

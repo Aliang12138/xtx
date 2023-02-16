@@ -73,6 +73,8 @@ export interface HotItem {
    * 标题
    */
   title: string;
+  //推荐类型
+  type: string;
 }
 //热门推荐
 export function getHomeHot() {
@@ -200,6 +202,114 @@ export function getHomeguessLike(data: GetHomeGoodsGuessLikeData) {
   return http<GetHomeGoodsGuessLikeResult>({
     method: "GET",
     url: "/home/goods/guessLike",
+    data: data,
+  });
+}
+
+//推荐通用参数
+interface RecommendData {
+  subType?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface RecommendResult {
+  /**
+   * 活动图片
+   */
+  bannerPicture: string;
+  /**
+   * id信息
+   */
+  id: string;
+  /**
+   * 子类选项集合
+   */
+  subTypes: SubType[];
+  /**
+   * 活动标题
+   */
+  title: string;
+}
+
+/**
+ * 子类选项
+ */
+export interface SubType {
+  goodsItems: GoodsItem[];
+  /**
+   * 子类选项id
+   */
+  id: string;
+  /**
+   * 子类选项名称
+   */
+  title: string;
+}
+
+export interface GoodsItem {
+  /**
+   * 总数量
+   */
+  counts: string;
+  /**
+   * 商品集合
+   */
+  items: Item[];
+  /**
+   * 页码
+   */
+  page: string;
+  /**
+   * 总页数
+   */
+  pages: string;
+  /**
+   * 页容量
+   */
+  pageSize: string;
+}
+
+/**
+ * 商品项
+ */
+export interface Item {
+  /**
+   * 商品描述
+   */
+  desc: string;
+  /**
+   * 商品id
+   */
+  id: string;
+  /**
+   * 商品名称
+   */
+  name: string;
+  /**
+   * 商品图片
+   */
+  picture: string;
+  /**
+   * 商品价格
+   */
+  price: number;
+}
+
+//特惠推荐
+export function getHotPreference(data: RecommendData) {
+  return http<RecommendResult>({
+    method: "GET",
+    url: "/hot/preference",
+    data: data,
+  });
+}
+
+//爆款推荐
+export function getHotInVogue(data: RecommendData) {
+  return http<RecommendResult>({
+    method: "GET",
+    url: "/hot/inVogue",
     data: data,
   });
 }
