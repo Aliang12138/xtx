@@ -1,5 +1,6 @@
 import { http } from "@/utils/http";
 
+//轮播图数据
 export interface BannerItem {
   hrefUrl: string;
   id: string;
@@ -11,7 +12,7 @@ export interface BannerItem {
  *
  * @param distributionSite 示例值：广告区域展示位置,1 为首页（默认值）2 为商品分类页
  */
-
+//广告轮播
 export function getHomeBanner(distributionSite = 1) {
   return http<BannerItem[]>({
     method: "GET",
@@ -119,5 +120,75 @@ export function getHomeNew(limit = 4) {
     data: {
       limit,
     },
+  });
+}
+
+// 猜你喜欢
+interface GetHomeguessLikeData {
+  page?: number;
+  pageSize?: number;
+}
+/**
+ * 返回数据
+ */
+export interface guessLikeItem {
+  /**
+   * 总条数
+   */
+  counts: number;
+  /**
+   * 当前页数据
+   */
+  items: GuessItem[];
+  /**
+   * 当前页数
+   */
+  page: number;
+  /**
+   * 总页数
+   */
+  pages: number;
+  /**
+   * 每页条数
+   */
+  pageSize: number;
+}
+
+export interface GuessItem {
+  /**
+   * 商品描述
+   */
+  desc: string;
+  /**
+   * 商品折扣
+   */
+  discount: number;
+  /**
+   * id
+   */
+  id: string;
+  /**
+   * 商品名称
+   */
+  name: string;
+  /**
+   * 商品已下单数量
+   */
+  orderNum: number;
+  /**
+   * 商品图片
+   */
+  picture: string;
+  /**
+   * 商品价格
+   */
+  price: number;
+}
+//猜你喜欢
+export function getHomeguessLike(data: GetHomeguessLikeData) {
+  return http<guessLikeItem[]>({
+    method: "GET",
+    url: "/home/goods/guessLike",
+    data: data,
   });
 }

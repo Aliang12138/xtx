@@ -1,13 +1,8 @@
 <script setup lang="ts">
-interface Goods {
-  name: string
-  path: string
-  price: number
-}
-
+import { GuessItem } from "@/apis/home";
 defineProps<{
-  source: Goods[]
-}>()
+  source: GuessItem[];
+}>();
 </script>
 
 <template>
@@ -16,50 +11,17 @@ defineProps<{
     <text class="text">猜你喜欢</text>
   </view>
   <view class="guess">
-    <navigator url="/pages/goods/index" class="navigator">
-      <image
-        class="image"
-        mode="aspectFill"
-        src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_1.jpg"
-      ></image>
-      <view class="name"
-        >肖勒超薄防水手表精钢材质放水水功能肖勒超薄防水手表精钢材质放水水功能肖勒超薄防水手表精钢材质放水水功能</view
-      >
+    <navigator
+      :url="`/pages/goods/index?id=${item.id}`"
+      class="navigator"
+      v-for="item in source"
+      :key="item.id"
+    >
+      <image class="image" mode="aspectFill" :src="item.picture"></image>
+      <view class="name">{{ item.name }}</view>
       <view class="price">
-        <text class="small">¥</text>899<text class="small">.00</text>
-      </view>
-    </navigator>
-    <navigator url="/pages/goods/index" class="navigator">
-      <image
-        class="image"
-        mode="aspectFill"
-        src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_2.jpg"
-      ></image>
-      <view class="name">肖勒超薄防水手表精钢材质放水水功能</view>
-      <view class="price">
-        <text class="small">¥</text>899<text class="small">.00</text>
-      </view>
-    </navigator>
-    <navigator url="/pages/goods/index" class="navigator">
-      <image
-        class="image"
-        mode="aspectFill"
-        src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_3.jpg"
-      ></image>
-      <view class="name">肖勒超薄防水手表精钢材质放水水功能</view>
-      <view class="price">
-        <text class="small">¥</text>899<text class="small">.00</text>
-      </view>
-    </navigator>
-    <navigator url="/pages/goods/index" class="navigator">
-      <image
-        class="image"
-        mode="aspectFill"
-        src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_4.jpg"
-      ></image>
-      <view class="name">肖勒超薄防水手表精钢材质放水水功能</view>
-      <view class="price">
-        <text class="small">¥</text>899<text class="small">.00</text>
+        <text class="small">¥</text>{{ item.price
+        }}<text class="small">.00</text>
       </view>
     </navigator>
   </view>
@@ -88,7 +50,7 @@ defineProps<{
 
 .caption .text::before,
 .caption .text::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 6rpx;
   width: 20rpx;

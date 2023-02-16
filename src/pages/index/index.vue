@@ -13,6 +13,8 @@ import {
   HotItem,
   getHomeNew,
   HomeNewItem,
+  getHomeguessLike,
+  GuessItem,
 } from "@/apis/home";
 
 // pinia
@@ -42,12 +44,16 @@ const bannerList = ref<BannerItem[]>([]);
 const categoryList = ref<CategoryItem[]>([]);
 const hotList = ref<HotItem[]>([]);
 const newList = ref<HomeNewItem[]>([]);
+const guessLikeList = ref<GuessItem[]>([]);
 //通过封装的 http通用函数发请求
 const loadData = async () => {
   bannerList.value = await getHomeBanner();
   categoryList.value = await getHomeCategory();
   hotList.value = await getHomeHot();
   newList.value = await getHomeNew();
+  const res = await getHomeguessLike({ page: 1, pageSize: 10 });
+  console.log(res);
+  guessLikeList.value = res.items;
 };
 loadData();
 </script>
@@ -207,7 +213,7 @@ loadData();
       </view>
     </view>
     <!-- 猜你喜欢 -->
-    <guess :source="[]"></guess>
+    <guess :source="guessLikeList"></guess>
     <view class="loading" v-if="hasMore">正在加载...</view>
   </scroll-view>
 </template>
