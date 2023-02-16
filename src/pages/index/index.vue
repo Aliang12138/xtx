@@ -7,10 +7,12 @@ import entries from "./components/entries/index.vue";
 import {
   getHomeBanner,
   BannerItem,
-  getHomeCategoryMutli,
+  getHomeCategory,
   CategoryItem,
-  getHomeHotMutli,
+  getHomeHot,
   HotItem,
+  getHomeNew,
+  HomeNewItem,
 } from "@/apis/home";
 
 // pinia
@@ -39,11 +41,13 @@ const nextVersion = () => {
 const bannerList = ref<BannerItem[]>([]);
 const categoryList = ref<CategoryItem[]>([]);
 const hotList = ref<HotItem[]>([]);
+const newList = ref<HomeNewItem[]>([]);
 //通过封装的 http通用函数发请求
 const loadData = async () => {
   bannerList.value = await getHomeBanner();
-  categoryList.value = await getHomeCategoryMutli();
-  hotList.value = await getHomeHotMutli();
+  categoryList.value = await getHomeCategory();
+  hotList.value = await getHomeHot();
+  newList.value = await getHomeNew();
 };
 loadData();
 </script>
@@ -114,37 +118,17 @@ loadData();
         >
       </view>
       <view class="cards">
-        <navigator hover-class="none" url="/pages/goods/index">
-          <image
-            mode="aspectFit"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_small_9.jpg"
-          ></image>
-          <view class="name">香水小样</view>
-          <view class="price"> <text class="small">¥</text>299 </view>
-        </navigator>
-        <navigator hover-class="none" url="/pages/goods/index">
-          <image
-            mode="aspectFit"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_small_10.jpg"
-          ></image>
-          <view class="name">红外体温仪</view>
-          <view class="price"> <text class="small">¥</text>266 </view>
-        </navigator>
-        <navigator hover-class="none" url="/pages/goods/index">
-          <image
-            mode="aspectFit"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_small_11.jpg"
-          ></image>
-          <view class="name">美的电饭煲美的电饭煲</view>
-          <view class="price"> <text class="small">¥</text>199 </view>
-        </navigator>
-        <navigator hover-class="none" url="/pages/goods/index">
-          <image
-            mode="aspectFit"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_small_12.jpg"
-          ></image>
-          <view class="name">过滤水壶</view>
-          <view class="price"> <text class="small">¥</text>99 </view>
+        <navigator
+          hover-class="none"
+          :url="`/pages/goods/index?id=${item.id}`"
+          v-for="item in newList"
+          :key="item.id"
+        >
+          <image mode="aspectFit" :src="item.picture"></image>
+          <view class="name">{{ item.name }}</view>
+          <view class="price">
+            <text class="small">¥</text>{{ item.price }}</view
+          >
         </navigator>
       </view>
     </view>

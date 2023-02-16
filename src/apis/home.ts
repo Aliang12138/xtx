@@ -41,7 +41,7 @@ export interface CategoryItem {
 }
 
 // 前台分类
-export function getHomeCategoryMutli() {
+export function getHomeCategory() {
   return http<CategoryItem[]>({
     method: "GET",
     url: "/home/category/mutli",
@@ -74,9 +74,50 @@ export interface HotItem {
   title: string;
 }
 //热门推荐
-export function getHomeHotMutli() {
+export function getHomeHot() {
   return http<HotItem[]>({
     method: "GET",
     url: "/home/hot/mutli",
+  });
+}
+
+/**
+ * 新鲜好物数据信息
+ */
+export interface HomeNewItem {
+  /**
+   * 备注
+   */
+  desc: string;
+  /**
+   * id
+   */
+  id: string;
+  /**
+   * 商品名称
+   */
+  name: string;
+  /**
+   * 商品图片链接
+   */
+  picture: string;
+  /**
+   * 价格
+   */
+  price: number;
+}
+
+/**
+ *
+ * @param limit 默认值为 4，指定响应数据中商品的数量
+ */
+//新鲜好物
+export function getHomeNew(limit = 4) {
+  return http<HomeNewItem[]>({
+    method: "GET",
+    url: "/home/new",
+    data: {
+      limit,
+    },
   });
 }
