@@ -19,7 +19,7 @@ type ApiRes = {
   result: any;
 };
 
-export const http = <T>(options: any) => {
+export const http = <T>(options: UniApp.RequestOptions) => {
   //返回promise对象
   return new Promise<T>((resolve, reject) => {
     uni.request({

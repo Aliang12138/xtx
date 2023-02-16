@@ -4,7 +4,12 @@ import useAppStore from "@/store/index";
 import carousel from "@/components/carousel/index.vue";
 import guess from "@/components/guess/index.vue";
 import entries from "./components/entries/index.vue";
-import { getHomeBanner, BannerItem } from "@/apis/home";
+import {
+  getHomeBanner,
+  BannerItem,
+  getHomeCategoryMutli,
+  CategoryItem,
+} from "@/apis/home";
 
 // pinia
 const appStore = useAppStore();
@@ -30,9 +35,11 @@ const nextVersion = () => {
 
 // -----------------------
 const bannerList = ref<BannerItem[]>([]);
+const categoryList = ref<CategoryItem[]>([]);
 //通过封装的 http通用函数发请求
 const loadData = async () => {
   bannerList.value = await getHomeBanner();
+  categoryList.value = await getHomeCategoryMutli();
 };
 loadData();
 </script>
@@ -66,7 +73,7 @@ loadData();
     <!-- 焦点图 -->
     <carousel style="height: 280rpx" :source="bannerList"></carousel>
     <!-- 前台类目 -->
-    <entries :source="[]"></entries>
+    <entries :source="categoryList"></entries>
     <!-- 推荐专区 -->
     <view class="panel recommend">
       <view class="item">

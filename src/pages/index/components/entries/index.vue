@@ -1,16 +1,17 @@
 <script setup lang="ts">
+import { CategoryItem } from "@/apis/home";
 // 响应数据
-let cursorLeft = $ref('0%')
+let cursorLeft = $ref("0%");
 
 // 组件属性
 defineProps<{
-  source: []
-}>()
+  source: CategoryItem[];
+}>();
 
 // 滚动事件
 const scrolled = (ev: WechatMiniprogram.ScrollViewScroll) => {
-  cursorLeft = (ev.detail.scrollLeft / ev.detail.scrollWidth) * 100 + '%'
-}
+  cursorLeft = (ev.detail.scrollLeft / ev.detail.scrollWidth) * 100 + "%";
+};
 </script>
 
 <template>
@@ -28,111 +29,11 @@ const scrolled = (ev: WechatMiniprogram.ScrollViewScroll) => {
             class="navigator"
             hover-class="none"
             url="/pages/goods/list/index"
+            v-for="item in source"
+            :key="item.id"
           >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_1.png"
-            ></image>
-            <text class="text">美食</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_2.png"
-            ></image>
-            <text class="text">餐厨</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_3.png"
-            ></image>
-            <text class="text">电器</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_4.png"
-            ></image>
-            <text class="text">居家</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_5.png"
-            ></image>
-            <text class="text">洗护</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_6.png"
-            ></image>
-            <text class="text">汽车</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_7.png"
-            ></image>
-            <text class="text">旅行</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_8.png"
-            ></image>
-            <text class="text">母婴</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_9.png"
-            ></image>
-            <text class="text">专题</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_10.png"
-            ></image>
-            <text class="text">品牌</text>
+            <image class="icon" :src="item.icon"></image>
+            <text class="text">{{ item.name }}</text>
           </navigator>
         </view>
         <view class="navs-item">
@@ -140,111 +41,11 @@ const scrolled = (ev: WechatMiniprogram.ScrollViewScroll) => {
             class="navigator"
             hover-class="none"
             url="/pages/goods/list/index"
+            v-for="item in source"
+            :key="item.id"
           >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_1.png"
-            ></image>
-            <text class="text">美食</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_2.png"
-            ></image>
-            <text class="text">餐厨</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_3.png"
-            ></image>
-            <text class="text">电器</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_4.png"
-            ></image>
-            <text class="text">居家</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_5.png"
-            ></image>
-            <text class="text">洗护</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_6.png"
-            ></image>
-            <text class="text">汽车</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_7.png"
-            ></image>
-            <text class="text">旅行</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_8.png"
-            ></image>
-            <text class="text">母婴</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_9.png"
-            ></image>
-            <text class="text">专题</text>
-          </navigator>
-          <navigator
-            class="navigator"
-            hover-class="none"
-            url="/pages/goods/list/index"
-          >
-            <image
-              class="icon"
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/nav_icon_10.png"
-            ></image>
-            <text class="text">品牌</text>
+            <image class="icon" :src="item.icon"></image>
+            <text class="text">{{ item.name }}</text>
           </navigator>
         </view>
       </view>

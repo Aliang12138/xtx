@@ -21,3 +21,29 @@ export function getHomeBanner(distributionSite = 1) {
     },
   });
 }
+
+/**
+ * 数据
+ */
+export interface CategoryItem {
+  /**
+   * 展示图标
+   */
+  icon: string;
+  /**
+   * id
+   */
+  id: string;
+  /**
+   * 分类名称
+   */
+  name: string;
+}
+
+// 前台分类
+export function getHomeCategoryMutli() {
+  return http<CategoryItem[]>({
+    method: "GET",
+    url: "/home/category/mutli",
+  });
+}
