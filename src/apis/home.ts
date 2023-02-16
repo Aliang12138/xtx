@@ -123,15 +123,24 @@ export function getHomeNew(limit = 4) {
   });
 }
 
-// 猜你喜欢
-interface GetHomeguessLikeData {
+/**
+ * 首页-猜你喜欢-请求参数
+ */
+interface GetHomeGoodsGuessLikeData {
+  /**
+   * 说明：页码默认值1
+   */
   page?: number;
+  /**
+   * 说明：页大小默认是10
+   */
   pageSize?: number;
 }
+
 /**
- * 返回数据
+ *  首页-猜你喜欢-返回数据
  */
-export interface guessLikeItem {
+export interface GetHomeGoodsGuessLikeResult {
   /**
    * 总条数
    */
@@ -184,9 +193,11 @@ export interface GuessItem {
    */
   price: number;
 }
-//猜你喜欢
-export function getHomeguessLike(data: GetHomeguessLikeData) {
-  return http<guessLikeItem[]>({
+/**
+ * 首页-猜你喜欢-小程序和app
+ */
+export function getHomeguessLike(data: GetHomeGoodsGuessLikeData) {
+  return http<GetHomeGoodsGuessLikeResult>({
     method: "GET",
     url: "/home/goods/guessLike",
     data: data,
