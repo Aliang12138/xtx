@@ -51,11 +51,26 @@ const loadData = async () => {
   categoryList.value = await getHomeCategory();
   hotList.value = await getHomeHot();
   newList.value = await getHomeNew();
-  const res = await getHomeguessLike({ page: 1, pageSize: 10 });
-  console.log(res);
-  guessLikeList.value = res.items;
+  getGuessList();
 };
 loadData();
+
+let page = 1;
+//猜你喜欢需要调用多次
+const getGuessList = async () => {
+  // 调用接口;
+  const res = await getHomeguessLike({ page: page, pageSize: 10 });
+  // console.log(res);
+  //追加分页数据
+  guessLikeList.value.push(...res.items);
+};
+
+//滚动到底部时触发
+const onScrolltolower = () => {
+  //页码自增
+  page++;
+  getGuessList();
+};
 </script>
 
 <template>
@@ -83,6 +98,7 @@ loadData();
     enhanced
     refresher-background="#f7f7f8"
     :show-scrollbar="false"
+    @scrolltolower="onScrolltolower"
   >
     <!-- 焦点图 -->
     <carousel style="height: 280rpx" :source="bannerList"></carousel>
