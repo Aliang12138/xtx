@@ -47,10 +47,20 @@ const newList = ref<HomeNewItem[]>([]);
 const guessLikeList = ref<GuessItem[]>([]);
 //通过封装的 http通用函数发请求
 const loadData = async () => {
-  bannerList.value = await getHomeBanner();
-  categoryList.value = await getHomeCategory();
-  hotList.value = await getHomeHot();
-  newList.value = await getHomeNew();
+  // bannerList.value = await getHomeBanner();
+  // categoryList.value = await getHomeCategory();
+  // hotList.value = await getHomeHot();
+  // newList.value = await getHomeNew();
+  const res = await Promise.all([
+    getHomeBanner(),
+    getHomeCategory(),
+    getHomeHot(),
+    getHomeNew(),
+  ]);
+  bannerList.value = res[0];
+  categoryList.value = res[1];
+  hotList.value = res[2];
+  newList.value = res[3];
   getGuessList();
 };
 loadData();
@@ -77,6 +87,22 @@ const onScrolltolower = () => {
   //页码自增
   page++;
   getGuessList();
+};
+
+const triggered = ref(false);
+//下拉刷新
+const onRefresherrefresh = async () => {
+  triggered.value = true;
+  //清空数据
+  bannerList.value = [];
+  categoryList.value = [];
+  hotList.value = [];
+  newList.value = [];
+  guessLikeList.value = [];
+  //重置页码
+  page = 1;
+  await loadData();
+  triggered.value = false;
 };
 </script>
 
@@ -106,6 +132,8 @@ const onScrolltolower = () => {
     refresher-background="#f7f7f8"
     :show-scrollbar="false"
     @scrolltolower="onScrolltolower"
+    @refresherrefresh="onRefresherrefresh"
+    :refresher-triggered="triggered"
   >
     <!-- 焦点图 -->
     <carousel style="height: 280rpx" :source="bannerList"></carousel>
