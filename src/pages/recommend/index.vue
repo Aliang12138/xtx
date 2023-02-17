@@ -2,7 +2,7 @@
 import { reactive, ref } from "vue";
 
 import { onLoad } from "@dcloudio/uni-app";
-import { getHotRecommend, SubType } from "@/apis/home";
+import { getHotRecommend, GoodsItem, SubType } from "@/apis/home";
 
 interface metaType {
   title: string;
@@ -51,6 +51,7 @@ uni.setNavigationBarTitle({
 
 //-----------------------------------------
 const bannerPicture = ref("");
+// type SubTypesAndGoods = SubType & GoodsItem;
 const subTypes = ref<SubType[]>([]);
 const urlMap = [
   { type: "1", url: "/hot/preference" },
@@ -59,23 +60,46 @@ const urlMap = [
   { type: "4", url: "/hot/preference" },
   { type: "5", url: "/hot/new" },
 ];
+let currUrl = "";
 onLoad(async ({ type }) => {
   const currUrlMap = urlMap.find((v) => v.type === type);
   if (currUrlMap) {
+    //保存请求
+    currUrl = currUrlMap.url;
     const res = await getHotRecommend(currUrlMap.url, {});
     //动态更新导航栏标题
     uni.setNavigationBarTitle({ title: res.title });
     //保存轮播图
     bannerPicture.value = res.bannerPicture;
     //保存tabs数据
-    subTypes.value = res.subTypes;
+    // subTypes.value = res.subTypes;
+    res.subTypes.forEach((item) => {
+      const obj = {
+        ...item,
+        ...res.subTypes[Number(item.id)],
+      };
+      subTypes.value.push(obj);
+    });
   }
 });
 
+//分类高亮
 const activeIndex = ref(0);
 const changeTabs = (index: number) => {
   activeIndex.value = index;
 };
+
+//分类滚动
+// const onScrolltolower = async () => {
+//   const currSubtypes = subTypes.value[activeIndex.value];
+//   currSubtypes.goodsItems.page++;
+//   const res = await getHotRecommend(currUrl, {
+//     pageSize: 10,
+//     page: currSubtypes.page,
+//     subType: currSubtypes.id,
+//   });
+//   console.log(res.subTypes[Number(currSubtypes.id)].items);
+// };
 </script>
 
 <template>
@@ -94,134 +118,30 @@ const changeTabs = (index: number) => {
         >{{ item.title }}</text
       >
     </view>
-    <scroll-view scroll-y enhanced :show-scrollbar="false" class="scroll-view">
+    <scroll-view
+      v-for="(item, index) in subTypes"
+      :key="item.id"
+      scroll-y
+      enhanced
+      :show-scrollbar="false"
+      class="scroll-view"
+      v-show="activeIndex === index"
+    >
+      <!-- @scrolltolower="onScrolltolower" -->
       <view class="goods">
         <navigator
           hover-class="none"
-          url="/pages/goods/index"
+          :url="`/pages/goods/index?=${goods.id}`"
           class="navigator"
+          v-for="goods in item.goodsItems.items"
+          :key="goods.id"
         >
-          <image
-            class="thumb"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_2.jpg"
-          ></image>
-          <view class="name ellipsis">肖勒超薄防水手表精钢材质 放水水功能</view>
+          <image class="thumb" :src="goods.picture"></image>
+          <view class="name ellipsis">{{ goods.name }}</view>
           <view class="price">
             <text class="symbol">¥</text>
-            <text class="number">199</text>
-            <text class="decimal">.00</text>
-          </view>
-        </navigator>
-        <navigator
-          hover-class="none"
-          url="/pages/goods/index"
-          class="navigator"
-        >
-          <image
-            class="thumb"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_6.jpg"
-          ></image>
-          <view class="name ellipsis">肖勒超薄防水手表精钢材质 放水水功能</view>
-          <view class="price">
-            <text class="symbol">¥</text>
-            <text class="number">199</text>
-            <text class="decimal">.00</text>
-          </view>
-        </navigator>
-        <navigator
-          hover-class="none"
-          url="/pages/goods/index"
-          class="navigator"
-        >
-          <image
-            class="thumb"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_4.jpg"
-          ></image>
-          <view class="name ellipsis">肖勒超薄防水手表精钢材质 放水水功能</view>
-          <view class="price">
-            <text class="symbol">¥</text>
-            <text class="number">199</text>
-            <text class="decimal">.00</text>
-          </view>
-        </navigator>
-        <navigator
-          hover-class="none"
-          url="/pages/goods/index"
-          class="navigator"
-        >
-          <image
-            class="thumb"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_5.jpg"
-          ></image>
-          <view class="name ellipsis">肖勒超薄防水手表精钢材质 放水水功能</view>
-          <view class="price">
-            <text class="symbol">¥</text>
-            <text class="number">199</text>
-            <text class="decimal">.00</text>
-          </view>
-        </navigator>
-        <navigator
-          hover-class="none"
-          url="/pages/goods/index"
-          class="navigator"
-        >
-          <image
-            class="thumb"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_2.jpg"
-          ></image>
-          <view class="name ellipsis">肖勒超薄防水手表精钢材质 放水水功能</view>
-          <view class="price">
-            <text class="symbol">¥</text>
-            <text class="number">199</text>
-            <text class="decimal">.00</text>
-          </view>
-        </navigator>
-        <navigator
-          hover-class="none"
-          url="/pages/goods/index"
-          class="navigator"
-        >
-          <image
-            class="thumb"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_6.jpg"
-          ></image>
-          <view class="name ellipsis">肖勒超薄防水手表精钢材质 放水水功能</view>
-          <view class="price">
-            <text class="symbol">¥</text>
-            <text class="number">199</text>
-            <text class="decimal">.00</text>
-          </view>
-        </navigator>
-        <navigator
-          hover-class="none"
-          url="/pages/goods/index"
-          class="navigator"
-        >
-          <image
-            class="thumb"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_7.jpg"
-          ></image>
-          <view class="name ellipsis">肖勒超薄防水手表精钢材质 放水水功能</view>
-          <view class="price">
-            <text class="symbol">¥</text>
-            <text class="number">199</text>
-            <text class="decimal">.00</text>
-          </view>
-        </navigator>
-        <navigator
-          hover-class="none"
-          url="/pages/goods/index"
-          class="navigator"
-        >
-          <image
-            class="thumb"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_3.jpg"
-          ></image>
-          <view class="name ellipsis">肖勒超薄防水手表精钢材质 放水水功能</view>
-          <view class="price">
-            <text class="symbol">¥</text>
-            <text class="number">199</text>
-            <text class="decimal">.00</text>
+            <text class="number">{{ goods.price }}</text>
+            <!-- <text class="decimal">.00</text> -->
           </view>
         </navigator>
       </view>

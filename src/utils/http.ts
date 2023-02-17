@@ -1,5 +1,7 @@
 //接口服务器基地址
-const baseURL = "https://pcapi-xiaotuxian-front-devtest.itheima.net";
+// const baseURL = "https://pcapi-xiaotuxian-front-devtest.itheima.net";
+//备用服务器
+const baseURL = "https://pcapi-xiaotuxian-front.itheima.net";
 
 //添加拦截器
 uni.addInterceptor("request", {
