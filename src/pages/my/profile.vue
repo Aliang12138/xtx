@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { toRef } from 'vue'
+import { ref, toRef } from 'vue'
 import useAppStore from '@/store'
+import { onLoad } from '@dcloudio/uni-app';
+import { getMemberProfile, GetMemberProfileResult } from '@/apis/profile';
 
 const appStore = useAppStore()
 const safeArea = toRef(appStore, 'safeArea')
@@ -12,6 +14,11 @@ const goBack = () => {
 const chooseImage = () => {
   uni.chooseImage({})
 }
+//----------------------------------------
+const memberProfile = ref({} as GetMemberProfileResult)
+onLoad(async () => {
+  memberProfile.value = await getMemberProfile()
+}),
 </script>
 
 <template>
@@ -23,48 +30,55 @@ const chooseImage = () => {
     <scroll-view scroll-y>
       <!-- 头像 -->
       <view class="avatar">
-        <image
-          @tap="chooseImage"
-          src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/avatar_3.jpg"
-        />
+        <image @tap="chooseImage" :src="memberProfile.avatar" />
         <text>点击修改头像</text>
       </view>
       <!-- 用户信息 -->
       <view class="form">
         <view class="form-item">
           <text class="label">账号</text>
-          <input value="26219453547" />
+          <input readonly :value="memberProfile.account" />
         </view>
         <view class="form-item">
           <text class="label">昵称</text>
-          <input value="张三" />
+          <input :value="memberProfile.nickname" />
         </view>
         <view class="form-item">
           <text class="label">性别</text>
           <radio-group>
             <label class="radio">
-              <radio value="男" color="#27ba9b" :checked="true" /> 男
+              <radio
+                value="男"
+                color="#27ba9b"
+                :checked="memberProfile.gender === '男'"
+              />
+              男
             </label>
             <label class="radio">
-              <radio value="女" color="#27ba9b" /> 女
+              <radio
+                value="女"
+                color="#27ba9b"
+                :checked="memberProfile.gender === '女'"
+              />
+              女
             </label>
           </radio-group>
         </view>
         <view class="form-item">
           <text class="label">出生日期</text>
-          <picker mode="date" start="2015-09-01" end="2017-09-01">
-            <view>2021-01-02</view>
+          <picker mode="date" start="1960-01-01" end="2023-01-01">
+            <view>{{ memberProfile.birthday || "请选择日期" }}</view>
           </picker>
         </view>
         <view class="form-item">
           <text class="label">城市</text>
           <picker mode="region">
-            <view>北京</view>
+            <view>{{ memberProfile.fullLocation || "请选择城市" }}</view>
           </picker>
         </view>
         <view class="form-item">
           <text class="label">职业</text>
-          <input value="伙夫" />
+          <input :value="memberProfile.profession" placeholder="请输入职业" />
         </view>
       </view>
       <!-- 提交按钮 -->

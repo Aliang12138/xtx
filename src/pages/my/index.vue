@@ -64,6 +64,9 @@ onReady(() => {
 const memberStore = useMemberStore();
 //结构后依旧能保持数据的响应式
 const { profile, isLogin } = storeToRefs(memberStore);
+const goToProfile = () => {
+  uni.navigateTo({ url: "/pages/my/profile" });
+};
 </script>
 
 <template>
@@ -72,14 +75,21 @@ const { profile, isLogin } = storeToRefs(memberStore);
       <!-- 个人资料 -->
       <view class="profile">
         <view class="overview">
-          <image v-if="isLogin" class="avatar" :src="profile.avatar"></image>
+          <image
+            @tap="goToProfile"
+            v-if="isLogin"
+            class="avatar"
+            :src="profile.avatar"
+          ></image>
           <image
             v-else
             class="avatar"
             src="./微信图片_20220830092107.jpg"
           ></image>
           <view class="meta">
-            <view v-if="isLogin" class="nickname">{{ profile.nickname }}</view>
+            <view @tap="goToProfile" v-if="isLogin" class="nickname">{{
+              profile.nickname
+            }}</view>
             <navigator
               v-else
               url="/pages/login/index"
