@@ -1,64 +1,69 @@
 <script setup lang="ts">
-import { toRef, getCurrentInstance } from 'vue'
-import { onReady } from '@dcloudio/uni-app'
-import useAppStore from '@/store'
+import { toRef, getCurrentInstance } from "vue";
+import { onReady } from "@dcloudio/uni-app";
+import useAppStore from "@/store";
+import { useMemberStore } from "@/store/member";
+import { storeToRefs } from "pinia";
 
-const appStore = useAppStore()
-const safeArea = toRef(appStore, 'safeArea')
+const appStore = useAppStore();
+const safeArea = toRef(appStore, "safeArea");
 
-const tabs = ['我的收藏', '猜你喜欢', '我的足迹']
+const tabs = ["我的收藏", "猜你喜欢", "我的足迹"];
 const orderTypes = [
-  { text: '待付款', icon: 'icon-currency', type: 1 },
-  { text: '待发货', icon: 'icon-gift', type: 2 },
-  { text: '待收货', icon: 'icon-check', type: 3 },
-  { text: '待评价', icon: 'icon-comment', type: 4 },
-]
-let tabIndex = $ref(0)
+  { text: "待付款", icon: "icon-currency", type: 1 },
+  { text: "待发货", icon: "icon-gift", type: 2 },
+  { text: "待收货", icon: "icon-check", type: 3 },
+  { text: "待评价", icon: "icon-comment", type: 4 },
+];
+let tabIndex = $ref(0);
 
 // 获取页面实例
-const pageInstance: any = getCurrentInstance()
+const pageInstance: any = getCurrentInstance();
 
 const changeTab = (index: number) => {
-  tabIndex = index
-}
+  tabIndex = index;
+};
 
 onReady(() => {
   pageInstance.ctx.$scope.animate(
-    '.profile',
+    ".profile",
     [{ opacity: 1 }, { opacity: 0 }],
     500,
     {
-      scrollSource: '#scrollView',
+      scrollSource: "#scrollView",
       timeRange: 500,
       startScrollOffset: 0,
       endScrollOffset: 85,
-    },
-  )
+    }
+  );
 
   pageInstance.ctx.$scope.animate(
-    '.navbar',
-    [{ top: '0' }, { top: '-30px' }],
+    ".navbar",
+    [{ top: "0" }, { top: "-30px" }],
     500,
     {
-      scrollSource: '#scrollView',
+      scrollSource: "#scrollView",
       timeRange: 500,
       startScrollOffset: 0,
       endScrollOffset: 85,
-    },
-  )
+    }
+  );
 
   pageInstance.ctx.$scope.animate(
-    '.navbar .title',
+    ".navbar .title",
     [{ opacity: 0 }, { opacity: 1 }],
     500,
     {
-      scrollSource: '#scrollView',
+      scrollSource: "#scrollView",
       timeRange: 500,
       startScrollOffset: 85,
       endScrollOffset: 100,
-    },
-  )
-})
+    }
+  );
+});
+const memberStore = useMemberStore();
+//结构后依旧能保持数据的响应式
+const { profile, isLogin } = storeToRefs(memberStore);
 </script>
 
 <template>
@@ -67,16 +72,28 @@ onReady(() => {
       <!-- 个人资料 -->
       <view class="profile">
         <view class="overview">
+          <image v-if="isLogin" class="avatar" :src="profile.avatar"></image>
           <image
+            v-else
             class="avatar"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/avatar_3.jpg"
+            src="./微信图片_20220830092107.jpg"
           ></image>
           <view class="meta">
-            <view class="nickname">未登录</view>
+            <view v-if="isLogin" class="nickname">{{ profile.nickname }}</view>
+            <navigator
+              v-else
+              url="/pages/login/index"
+              open-type="navigate"
+              hover-class="none"
+            >
+              未登录
+            </navigator>
             <view class="extra">
-              <text class="tips">点击登录账号</text>
-              <!-- <text class="update">更新头像昵称</text>
-            <text class="relogin">切换账号</text> -->
+              <text v-if="!isLogin" class="tips">点击登录账号</text>
+              <template v-else>
+                <text class="update">更新头像昵称</text>
+                <text class="relogin">切换账号</text>
+              </template>
             </view>
           </view>
         </view>
@@ -652,7 +669,7 @@ scroll-view {
   width: 60rpx;
   height: 4rpx;
   background-color: #27ba9b;
-  content: '';
+  content: "";
   transform: translate(-50%);
 }
 

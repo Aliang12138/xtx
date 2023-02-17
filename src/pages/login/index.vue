@@ -1,9 +1,44 @@
 <script setup lang="ts">
-const getPhoneNumber = () => {}
+import { postLoginWxMinSimple } from "@/apis/login";
+import { useMemberStore } from "@/store/member";
+import { onLoad } from "@dcloudio/uni-app";
+
+const getPhoneNumber = () => {};
 // 提示消息
 const nextVersion = () => {
-  uni.showToast({ title: '等下一个版本哦', icon: 'none' })
-}
+  uni.showToast({ title: "等下一个版本哦", icon: "none" });
+};
+
+let code = "";
+onLoad(async () => {
+  // 调用接口获取登录凭证
+  const res = await wx.login();
+  code = res.code;
+});
+
+// 正式版登录,需认证小程序
+// const onGetPhoneNumber = async (ev: any) => {
+//   console.log(ev.detail);
+//   const res = await postLoginWxMin({
+//     code: code,
+//     iv: ev.detail.iv,
+//     encryptedData: ev.detail.encryptedData,
+//   });
+//   console.log(111, res);
+// };
+
+//内测版登录
+const memberStore = useMemberStore();
+const onGetPhoneNumberSimple = async () => {
+  const res = await postLoginWxMinSimple("13197670357");
+  memberStore.setProfile(res);
+  //提示
+  uni.showToast({ icon: "success", title: "登录成功" });
+  //跳转
+  setTimeout(() => {
+    uni.switchTab({ url: "/pages/my/index" });
+  }, 1000);
+};
 </script>
 
 <template>
@@ -14,9 +49,17 @@ const nextVersion = () => {
       ></image>
     </view>
     <view class="login">
-      <button class="button phone">
+      <!-- <button
+        class="button phone"
+        open-type="getPhoneNumber"
+        @getphonenumber="onGetPhoneNumber"
+      >
         <text class="icon icon-phone"></text>
         手机号快捷登录
+      </button> -->
+      <button class="button phone" @tap="onGetPhoneNumberSimple">
+        <text class="icon icon-phone"></text>
+        手机号快捷登录(内测)
       </button>
       <view class="extra">
         <view class="caption">

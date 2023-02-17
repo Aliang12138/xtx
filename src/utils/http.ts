@@ -1,5 +1,8 @@
 //接口服务器基地址
 // const baseURL = "https://pcapi-xiaotuxian-front-devtest.itheima.net";
+
+import { useMemberStore } from "@/store/member";
+
 //备用服务器
 const baseURL = "https://pcapi-xiaotuxian-front.itheima.net";
 
@@ -17,6 +20,13 @@ uni.addInterceptor("request", {
       ...args.header, //保留原本的header
       "source-client": "miniapp", //添加小程序端调用标识
     };
+    //在非vue文件中哪里使用就在哪里调用
+    const memberStore = useMemberStore();
+    // 获取token
+    const token = memberStore.profile.token;
+    if (token) {
+      args.header.Authorization = token;
+    }
   },
 });
 
