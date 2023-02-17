@@ -18,7 +18,7 @@ export function getHomeBanner(distributionSite = 1) {
     method: "GET",
     url: "/home/banner",
     data: {
-      distributionSite: distributionSite,
+      distributionSite,
     },
   });
 }
