@@ -226,7 +226,7 @@ export interface RecommendResult {
    * 子类选项集合
    */
   subTypes: SubType[];
-  goodsItems: GoodsItem[];
+  // goodsItems: GoodsItem[];
   /**
    * 活动标题
    */
@@ -237,7 +237,7 @@ export interface RecommendResult {
  * 子类选项
  */
 export interface SubType {
-  // goodsItems: GoodsItem[];
+  goodsItems: GoodsItem[];
   /**
    * 子类选项id
    */
