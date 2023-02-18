@@ -76,8 +76,8 @@ const goToProfile = () => {
       <view class="profile">
         <view class="overview">
           <image
-            @tap="goToProfile"
             v-if="isLogin"
+            @tap="goToProfile"
             class="avatar"
             :src="profile.avatar"
           ></image>

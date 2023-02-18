@@ -1,45 +1,78 @@
 <script setup lang="ts">
-import clause from './components/clause/index.vue'
-import helps from './components/helps/index.vue'
-import shipment from './components/shipment/index.vue'
-import sku from './components/sku/index.vue'
-import { toRef, ref } from 'vue'
-import useAppStore from '@/store'
+import clause from "./components/clause/index.vue";
+import helps from "./components/helps/index.vue";
+import shipment from "./components/shipment/index.vue";
+import sku from "./components/sku/index.vue";
+import { toRef, ref } from "vue";
+import useAppStore from "@/store";
+import { onLoad } from "@dcloudio/uni-app";
+import { getGoodsId, GoodsResult } from "@/apis/goods";
 
-const appStore = useAppStore()
-const safeArea = toRef(appStore, 'safeArea')
-
-// 返回上一页
-const goBack = () => {
-  uni.navigateBack({})
-}
+const appStore = useAppStore();
+const safeArea = toRef(appStore, "safeArea");
 
 // 跳转到购物车页面
 const goCart = () => {
-  uni.navigateTo({ url: '/pages/cart/default' })
-}
+  uni.navigateTo({ url: "/pages/cart/default" });
+};
 
 // 弹窗
 const popup = ref<{
-  open(): void
-  close(): void
-}>()
+  open(): void;
+  close(): void;
+}>();
 
-type Layer = 'helps' | 'sku' | 'shipment' | 'clause'
-const layer = ref<Layer>('helps')
+type Layer = "helps" | "sku" | "shipment" | "clause";
+const layer = ref<Layer>("helps");
 
 // 显示弹层
 const showHalfDialog = (layerName: Layer) => {
-  layer.value = layerName
-  popup.value!.open()
-}
+  layer.value = layerName;
+  popup.value!.open();
+};
 // 关闭弹层
 const hideHalfDialog = () => {
-  popup.value!.close()
-}
+  popup.value!.close();
+};
+//------------------------------------------
+const goods = ref({} as GoodsResult);
+onLoad(async ({ id }) => {
+  if (id) {
+    goods.value = await getGoodsId(id);
+  }
+});
+// 返回上一页
+const goBack = () => {
+  const res = getCurrentPages();
+  if (res.length === 1) {
+    return uni.switchTab({ url: "/pages/index/index" });
+  }
+  uni.navigateBack({});
+};
 </script>
 
+<style>
+.back {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 9;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  font-size: 23px;
+  color: #191919;
+  /* color: #fff; */
+  background-color: rgba(0, 0, 0, 0.5);
+}
+</style>
+
 <template>
+  <view class="back" @tap="goBack"></view>
   <scroll-view
     scroll-y
     enhanced
@@ -53,35 +86,8 @@ const hideHalfDialog = () => {
     <view class="goods anchor" data-anchor-index="0">
       <view class="preview">
         <swiper circular>
-          <swiper-item>
-            <image
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_preview_1.jpg"
-            />
-          </swiper-item>
-          <swiper-item>
-            <image
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_preview_2.jpg"
-            />
-          </swiper-item>
-          <swiper-item>
-            <image
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_preview_3.jpg"
-            />
-          </swiper-item>
-          <swiper-item>
-            <image
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_preview_4.jpg"
-            />
-          </swiper-item>
-          <swiper-item>
-            <image
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_preview_5.jpg"
-            />
-          </swiper-item>
-          <swiper-item>
-            <image
-              src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_preview_6.jpg"
-            />
+          <swiper-item v-for="(item, index) in goods.mainPictures" :key="index">
+            <image :src="item" />
           </swiper-item>
         </swiper>
         <view class="indicator">
@@ -522,7 +528,7 @@ page {
 }
 
 .navbar .tabs .active::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 18rpx;
   right: 20rpx;
@@ -569,9 +575,9 @@ page {
   top: 50%;
   right: 30rpx;
 
-  content: '\e6c2';
+  content: "\e6c2";
   color: #ccc;
-  font-family: 'erabbit' !important;
+  font-family: "erabbit" !important;
   font-size: 32rpx;
   transform: translateY(-50%);
 }
@@ -782,7 +788,7 @@ page {
 }
 
 .similar .bar .active::after {
-  content: '';
+  content: "";
   display: block;
   width: 60rpx;
   height: 4rpx;
