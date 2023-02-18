@@ -65,9 +65,19 @@ export const http = <T>(options: UniApp.RequestOptions) => {
     uni.request({
       //应用所有的参数
       ...options,
-      //成功
+      //成功 收到服务器响应皆为成功，uni.request和axios不一样
       success(res) {
-        resolve((res.data as ApiRes).result);
+        if (res.statusCode >= 200 && res.statusCode <= 300) {
+          resolve((res.data as ApiRes).result);
+        } else {
+          // 通用错误提示;
+          uni.showToast({
+            icon: "none",
+            title: (res.data as AnyObject).message,
+          });
+          // 标记为失败，await后面的代码就不会执行了
+          reject(res);
+        }
       },
       //失败
       fail(err) {

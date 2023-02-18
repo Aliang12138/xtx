@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { useMemberStore } from "@/store/member";
+
 //
+const memberStore = useMemberStore();
 </script>
 
 <template>
@@ -19,25 +22,27 @@
   </navigator> -->
 
     <!-- 操作列表 -->
-    <view class="list">
-      <navigator url="./address/index" hover-class="none" class="item arrow"
-        >我的收货地址</navigator
-      >
-      <!-- <navigator
+    <template v-if="memberStore.isLogin">
+      <view class="list">
+        <navigator url="./address/index" hover-class="none" class="item arrow"
+          >我的收货地址</navigator
+        >
+        <!-- <navigator
       hover-class="none"
       class="item arrow">我的尺码</navigator>
     <navigator
       hover-class="none"
       class="item arrow">我的兴趣</navigator> -->
-    </view>
-    <view class="list">
-      <!-- <navigator
+      </view>
+      <view class="list">
+        <!-- <navigator
       hover-class="none"
       class="item arrow">会员中心</navigator> -->
-      <navigator url="./account" hover-class="none" class="item arrow"
-        >账户与安全</navigator
-      >
-    </view>
+        <navigator url="./account" hover-class="none" class="item arrow"
+          >账户与安全</navigator
+        >
+      </view>
+    </template>
     <view class="list">
       <button hover-class="none" class="item arrow" open-type="feedback">
         问题反馈
@@ -78,9 +83,9 @@ button::after {
   position: absolute;
   top: 50%;
 
-  content: '\e6c2';
+  content: "\e6c2";
   color: #ccc;
-  font-family: 'erabbit' !important;
+  font-family: "erabbit" !important;
   font-size: 32rpx;
   transform: translateY(-50%);
 }
