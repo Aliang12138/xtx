@@ -1,10 +1,7 @@
-// 获取个人信息
-// /member/efilopr;
-
 import { http } from "@/utils/http";
 
 /**
- * 返回信息
+ * 会员中心-个人信息
  */
 export interface GetMemberProfileResult {
   /**
@@ -18,7 +15,7 @@ export interface GetMemberProfileResult {
   /**
    * 生日
    */
-  birthday: null | string;
+  birthday: string;
   /**
    * 省市区的名称：如山东省济南市里历下区
    */
@@ -34,24 +31,68 @@ export interface GetMemberProfileResult {
   /**
    * 昵称
    */
-  nickname: null | string;
+  nickname: string;
   /**
    * 职业
    */
-  profession: null | string;
+  profession: string;
 }
 
 /**
  * 性别，男、女、未知
  */
-export enum Gender {
-  女 = "女",
-  未知 = "未知",
-  男 = "男",
-}
+export type Gender = "未知" | "女" | "男";
+/**
+ * 获取个人信息
+ */
 export function getMemberProfile() {
   return http<GetMemberProfileResult>({
     method: "GET",
-    url: "/member/efilopr",
+    url: "/member/profile",
+  });
+}
+
+/**
+ *  个人信息-修改请求参数
+ */
+export interface PutMemberProfileData {
+  /**
+   * 生日 YYYY-MM-DD
+   */
+  birthday?: string;
+  /**
+   * 城市编码
+   */
+  cityCode?: string;
+  /**
+   * 区/县编码
+   */
+  countyCode?: string;
+  /**
+   * 性别，男、女、未知
+   */
+  gender?: Gender;
+  /**
+   * 昵称
+   */
+  nickname?: string;
+  /**
+   * 职业
+   */
+  profession?: string;
+  /**
+   * 省份编码
+   */
+  provinceCode?: string;
+}
+
+/**
+ * 个人信息-修改
+ */
+export function putMemberProfile(data: PutMemberProfileData) {
+  return http<GetMemberProfileResult>({
+    method: "PUT",
+    url: "/member/profile",
+    data: data,
   });
 }
