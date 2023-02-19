@@ -340,3 +340,55 @@ export function getGoodsId(id: string) {
     data: { id },
   });
 }
+
+/**
+ * 数据信息
+ */
+export interface GetGoodsRelevantData {
+  /**
+   * id
+   */
+  id: string;
+  /**
+   * 商品数量限制
+   */
+  limit?: number;
+}
+
+/**
+ * 数据信息
+ */
+export interface GoodsRelevantItem {
+  /**
+   * 备注
+   */
+  desc: string;
+  /**
+   * 折扣信息
+   */
+  discount: number | null;
+  /**
+   * id
+   */
+  id: string;
+  /**
+   * 商品名称
+   */
+  name: string;
+  /**
+   * 商品图片
+   */
+  picture: string;
+  /**
+   * 商品价格
+   */
+  price: string;
+}
+
+export function getGoodsRelevant(data: GetGoodsRelevantData) {
+  return http<GoodsRelevantItem[]>({
+    method: "GET",
+    url: "/goods/relevant",
+    data,
+  });
+}
