@@ -272,7 +272,7 @@ export interface Skus {
   /**
    * 价格
    */
-  price: string;
+  price: number;
   /**
    * sku编码
    */

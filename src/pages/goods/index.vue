@@ -14,6 +14,7 @@ import {
   GoodsRelevantItem,
   GoodsResult,
 } from "@/apis/goods";
+import { GoodsSku } from "@/components/vk-data-goods-sku-popup/types";
 
 const appStore = useAppStore();
 const safeArea = toRef(appStore, "safeArea");
@@ -46,8 +47,34 @@ const goods = ref({} as GoodsResult);
 const goodsRelevants = ref<GoodsRelevantItem[]>([]);
 onLoad(async ({ id }) => {
   if (id) {
+    //根据id获取商品详情
     goods.value = await getGoodsId(id);
+    //根据id获取推荐商品列表
     goodsRelevants.value = await getGoodsRelevant({ id, limit: 6 });
+    //✨
+    goodsSku.value = {
+      _id: goods.value.id,
+      name: goods.value.name,
+      goods_thumb: goods.value.mainPictures[0],
+      //通过映射把后端返回的格式改为sku插件所需的格式
+      sku_list: goods.value.skus.map((item) => {
+        return {
+          _id: item.id,
+          goods_id: goods.value.id,
+          goods_name: goods.value.name,
+          image: goods.value.mainPictures[0],
+          price: item.price * 100,
+          sku_name_arr: item.specs.map((v) => v.valueName),
+          stock: item.inventory,
+        };
+      }),
+      spec_list: goods.value.specs.map((item) => {
+        return {
+          name: item.name,
+          list: item.values.map((v) => ({ name: v.name })),
+        };
+      }),
+    };
   }
 });
 // 返回上一页
@@ -62,6 +89,24 @@ const goBack = () => {
 const current = ref(0);
 const swiperChange = (ev: WechatMiniprogram.SwiperChange) => {
   current.value = ev.detail.current;
+};
+
+// sku业务开始
+const isShowSku = ref(false);
+//按钮组模式通过枚举提升代码可读性
+enum SkuMode {
+  Both = 1,
+  Cart = 2,
+  Buy = 3,
+}
+const skuMode = ref(SkuMode.Both);
+//sku组件数据源
+const goodsSku = ref({} as GoodsSku);
+const openSkuPopup = (mode: SkuMode) => {
+  //显示什么按钮
+  skuMode.value = mode;
+  //sku组件显示
+  isShowSku.value = true;
 };
 </script>
 
@@ -131,6 +176,10 @@ const swiperChange = (ev: WechatMiniprogram.SwiperChange) => {
           <view class="remarks"> {{ goods.desc }} </view>
         </view>
         <view class="related">
+          <view @tap="openSkuPopup(SkuMode.Both)" class="item arrow">
+            <text class="label">选择</text>
+            <text class="text ellipsis">白色 红外体温计 1件</text>
+          </view>
           <view @tap="showHalfDialog('sku')" class="item arrow">
             <text class="label">选择</text>
             <text class="text ellipsis">白色 红外体温计 1件</text>
@@ -301,14 +350,14 @@ const swiperChange = (ev: WechatMiniprogram.SwiperChange) => {
       </view>
       <view class="buttons">
         <view
-          @tap="showHalfDialog('sku')"
+          @tap="openSkuPopup(SkuMode.Cart)"
           data-button-type="cart"
           class="addcart"
         >
           加入购物车
         </view>
         <view
-          @tap="showHalfDialog('sku')"
+          @tap="openSkuPopup(SkuMode.Buy)"
           data-button-type="payment"
           class="payment"
         >
@@ -326,6 +375,13 @@ const swiperChange = (ev: WechatMiniprogram.SwiperChange) => {
         <helps v-if="layer === 'helps'"></helps>
       </view>
     </uni-popup>
+
+    <!-- sku弹窗组件 -->
+    <vk-data-goods-sku-popup
+      v-model="isShowSku"
+      :mode="skuMode"
+      :localdata="goodsSku"
+    />
   </template>
 </template>
 
