@@ -31,12 +31,16 @@ onLoad(async () => {
 const memberStore = useMemberStore();
 const onGetPhoneNumberSimple = async () => {
   const res = await postLoginWxMinSimple("13197670357");
+  //保存用户信息到store中
   memberStore.setProfile(res);
   //提示
   uni.showToast({ icon: "success", title: "登录成功" });
   //跳转
   setTimeout(() => {
-    uni.switchTab({ url: "/pages/my/index" });
+    // 页面跳转
+    // uni.switchTab({ url: "/pages/my/index" });
+    //后退到前一页面
+    uni.navigateBack({});
   }, 1000);
 };
 </script>

@@ -1,91 +1,91 @@
 <script setup lang="ts">
-import guess from '@/components/guess/index.vue'
-import { ref } from 'vue'
-
-let cartList = ref([
-  {
-    id: '3434008',
-    skuId: '3673386',
-    name: '木天蓼逗猫棍15克',
-    attrsText: '商品:猫咪逗猫棍 ',
-    specs: [],
-    picture:
-      'https://yanxuan-item.nosdn.127.net/674ec7a88de58a026304983dd049ea69.jpg',
-    price: '16.00',
-    nowPrice: '16.00',
-    nowOriginalPrice: '16.00',
-    selected: true,
-    stock: 2936,
-    count: 1,
-    isEffective: true,
-    discount: null,
-    isCollect: false,
-    postFee: 1.0,
-  },
-  {
-    id: '3996846',
-    skuId: '300256547',
-    name: '国家非遗木叶盏，经典木叶茶具套装',
-    attrsText: '规格:经典木叶茶具套装一套（一壶两盏） ',
-    specs: [],
-    picture:
-      'https://yanxuan-item.nosdn.127.net/c9f3dc9792ce78a215d9ea9c14f9aad8.jpg',
-    price: '609.00',
-    nowPrice: '609.00',
-    nowOriginalPrice: '609.00',
-    selected: true,
-    stock: 4241,
-    count: 2,
-    isEffective: true,
-    discount: null,
-    isCollect: false,
-    postFee: 5.0,
-  },
-  {
-    id: '3997966',
-    skuId: '300265228',
-    name: '个大体肥，冷冻对虾400g',
-    attrsText: '规格:400g（50-60只/kg） ',
-    specs: [],
-    picture:
-      'https://yanxuan-item.nosdn.127.net/01dd5a65d131453074631d82d8f80d91.jpg',
-    price: '39.90',
-    nowPrice: '39.90',
-    nowOriginalPrice: '39.90',
-    selected: true,
-    stock: 2679,
-    count: 3,
-    isEffective: true,
-    discount: null,
-    isCollect: false,
-    postFee: 8.0,
-  },
-  {
-    id: '4004328',
-    skuId: '300338662',
-    name: '儿童多色圆领印花短袖T恤110-160cm',
-    attrsText: '颜色:本白 尺码:160cm ',
-    specs: [],
-    picture:
-      'https://yanxuan-item.nosdn.127.net/ddb4a80ac97a175bc633f0a53076815a.jpg',
-    price: '59.00',
-    nowPrice: '59.00',
-    nowOriginalPrice: '59.00',
-    selected: true,
-    stock: 422,
-    count: 4,
-    isEffective: true,
-    discount: null,
-    isCollect: false,
-    postFee: 7.0,
-  },
-])
+import {
+  deleteMemberCart,
+  getMemberCart,
+  MemberCartItem,
+  putMemberCartById,
+  putMemberCartSelected,
+} from "@/apis/cart";
+import guess from "@/components/guess/index.vue";
+import { useMemberStore } from "@/store/member";
+import { onShow } from "@dcloudio/uni-app";
+import { computed, ref } from "vue";
 
 const goPay = () => {
   uni.navigateTo({
-    url: '/pages/order/index',
-  })
-}
+    url: "/pages/order/index",
+  });
+};
+//----------------------------
+const carts = ref<MemberCartItem[]>([]);
+const memberStore = useMemberStore();
+const loadMemberCart = async () => {
+  carts.value = await getMemberCart();
+};
+onShow(async () => {
+  //判断登录才发请求
+  if (memberStore.isLogin) {
+    loadMemberCart();
+  }
+});
+
+//删除购物车商品
+const deleteCart = async (ids: string[]) => {
+  await deleteMemberCart({ ids });
+  loadMemberCart();
+  uni.showToast({ title: "删除成功" });
+};
+
+//修改商品数量
+const changeCount = (skuId: string, step: number) => {
+  //根据skuId查找出待修改的商品
+  const item = carts.value.find((v) => v.skuId === skuId);
+  if (item) {
+    // 先保存一个临时的数据，用于边界判断
+    const temp = item.count + step;
+    //最值边界判断
+    if (temp < 1) return;
+    if (temp > item.stock) return;
+    //更新数据
+    item.count = temp;
+    putMemberCartById(skuId, { count: item.count });
+  }
+};
+
+//修改商品选中状态
+const changeSelected = (skuId: string) => {
+  const item = carts.value.find((v) => v.skuId === skuId);
+  if (item) {
+    item.selected = !item.selected;
+    putMemberCartById(skuId, { selected: item.selected });
+  }
+};
+
+//计算全选状态
+const isSelectedAll = computed(() => {
+  return carts.value.every((v) => v.selected);
+});
+//修改全选状态
+const changeSelectedAll = () => {
+  //获取挡墙选中状态的值并取反
+  const temp = !isSelectedAll.value;
+  //用同一个取反后的值,批量更新列表的选中状态
+  carts.value.forEach((item) => {
+    item.selected = temp;
+  });
+  putMemberCartSelected({ selected: temp });
+};
+
+// 计算已选中的商品列表
+const selectedCarts = computed(() => carts.value.filter((v) => v.selected));
+// 基于选中商品列表计算出总钱数
+const selectedCartsPrice = computed(() =>
+  selectedCarts.value.reduce((sum, v) => v.price * v.count + sum, 0)
+);
+// 基于选中商品列表计算出总件数
+const selectedCartsCount = computed(() =>
+  selectedCarts.value.reduce((sum, v) => v.count + sum, 0)
+);
 </script>
 
 <template>
@@ -99,7 +99,7 @@ const goPay = () => {
       </view>
     </view>
 
-    <template v-if="true">
+    <template v-if="memberStore.isLogin">
       <!-- 优惠提示 -->
       <view class="tips">
         <text class="label">满减</text>
@@ -111,8 +111,8 @@ const goPay = () => {
         <uni-swipe-action>
           <uni-swipe-action-item
             class="swipe-cell"
-            v-for="(item, index) in cartList"
-            :key="index"
+            v-for="item in carts"
+            :key="item.skuId"
           >
             <navigator
               hover-class="none"
@@ -124,6 +124,7 @@ const goPay = () => {
                   'checkbox',
                   `icon-${item.selected ? 'checked' : 'ring'}`,
                 ]"
+                @tap.stop="changeSelected(item.skuId)"
               ></text>
               <!-- 商品缩略图 -->
               <image class="thumb" :src="item.picture"></image>
@@ -135,10 +136,10 @@ const goPay = () => {
                 <!-- 价格 -->
                 <view class="price"> ¥{{ item.price }} </view>
                 <!-- 商品数量，阻止冒泡 -->
-                <view class="quantity">
-                  <text class="text">-</text>
+                <view class="quantity" @tap.stop="() => {}">
+                  <text @tap="changeCount(item.skuId, -1)" class="text">-</text>
                   <input class="input" type="text" :value="item.count" />
-                  <text class="text">+</text>
+                  <text @tap="changeCount(item.skuId, 1)" class="text">+</text>
                 </view>
               </view>
             </navigator>
@@ -146,7 +147,9 @@ const goPay = () => {
             <template v-slot:right>
               <view class="swipe-cell-action">
                 <button class="collect-button">移入收藏</button>
-                <button class="delete-button">删除</button>
+                <button @tap="deleteCart([item.skuId])" class="delete-button">
+                  删除
+                </button>
               </view>
             </template>
           </uni-swipe-action-item>
@@ -155,9 +158,11 @@ const goPay = () => {
     </template>
 
     <!-- 状态提示 -->
-    <view class="blank" v-if="false">
+    <view class="blank" v-else>
       <text>登后后可查看购物车中的商品</text>
-      <button class="button">去登录</button>
+      <navigator url="/pages/login/index" hover-class="none">
+        <button class="button">去登录</button>
+      </navigator>
     </view>
 
     <!-- 猜你喜欢 -->
@@ -166,12 +171,19 @@ const goPay = () => {
 
   <!-- 吸底工具栏 -->
   <view class="toolbar" v-if="true">
-    <text class="all">全选</text>
+    <text
+      class="all"
+      :class="{ checked: isSelectedAll }"
+      @tap="changeSelectedAll"
+      >全选</text
+    >
     <text class="text">合计:</text>
-    <text class="amount">266.00</text>
+    <text class="amount">{{ selectedCartsPrice }}</text>
     <!-- 操作按钮 -->
     <view class="buttons">
-      <view class="button payment" @tap="goPay">去结算</view>
+      <view class="button payment" @tap="goPay"
+        >去结算({{ selectedCartsCount }})</view
+      >
       <view class="button collect">移入收藏</view>
       <view class="button delete">删除</view>
     </view>
@@ -230,7 +242,7 @@ const goPay = () => {
   position: absolute;
   top: 50%;
 
-  content: '';
+  content: "";
   width: 6rpx;
   height: 4rpx;
   background-color: #8c8c8c;
@@ -413,15 +425,15 @@ const goPay = () => {
 }
 
 .toolbar .all::before {
-  font-family: 'erabbit' !important;
-  content: '\e6cd';
+  font-family: "erabbit" !important;
+  content: "\e6cd";
   font-size: 36rpx;
   margin-right: 8rpx;
   vertical-align: -4rpx;
 }
 
 .toolbar .checked::before {
-  content: '\e6cc';
+  content: "\e6cc";
   color: #27ba9b;
 }
 
@@ -439,7 +451,7 @@ const goPay = () => {
 }
 
 .toolbar .amount::before {
-  content: '￥';
+  content: "￥";
   font-size: 12px;
 }
 

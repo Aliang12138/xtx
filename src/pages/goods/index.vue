@@ -5,16 +5,17 @@ import shipment from "./components/shipment/index.vue";
 import sku from "./components/sku/index.vue";
 //导入骨架屏组件
 import skeleton from "./components/skeleton/index.vue";
-import { toRef, ref } from "vue";
+import { toRef, ref, computed } from "vue";
 import useAppStore from "@/store";
 import { onLoad } from "@dcloudio/uni-app";
+import { postMemberCart } from "@/apis/cart";
 import {
   getGoodsId,
   getGoodsRelevant,
   GoodsRelevantItem,
   GoodsResult,
 } from "@/apis/goods";
-import { GoodsSku } from "@/components/vk-data-goods-sku-popup/types";
+import { GoodsSku, SkuEvent } from "@/components/vk-data-goods-sku-popup/types";
 
 const appStore = useAppStore();
 const safeArea = toRef(appStore, "safeArea");
@@ -108,6 +109,20 @@ const openSkuPopup = (mode: SkuMode) => {
   //sku组件显示
   isShowSku.value = true;
 };
+
+//准备一个响应式数据，用于存储sku组件实例
+const skuRef = ref();
+// 用于sku展示的规格文本 并用计算属性解决代码冗余
+const selectArrText = computed(() => skuRef.value?.selectArr.join(" ").trim());
+
+//加入购物车
+const onAddCart = async (ev: SkuEvent) => {
+  await postMemberCart({ skuId: ev._id, count: ev.buy_num });
+  uni.showToast({ title: "添加成功" });
+  //关闭sku
+  isShowSku.value = false;
+};
+const onBuyNow = (ev: SkuEvent) => {};
 </script>
 
 <style>
@@ -178,11 +193,9 @@ const openSkuPopup = (mode: SkuMode) => {
         <view class="related">
           <view @tap="openSkuPopup(SkuMode.Both)" class="item arrow">
             <text class="label">选择</text>
-            <text class="text ellipsis">白色 红外体温计 1件</text>
-          </view>
-          <view @tap="showHalfDialog('sku')" class="item arrow">
-            <text class="label">选择</text>
-            <text class="text ellipsis">白色 红外体温计 1件</text>
+            <text class="text ellipsis">{{
+              selectArrText || "请选择商品规格"
+            }}</text>
           </view>
           <view @tap="showHalfDialog('shipment')" class="item arrow">
             <text class="label">送至</text>
@@ -381,6 +394,9 @@ const openSkuPopup = (mode: SkuMode) => {
       v-model="isShowSku"
       :mode="skuMode"
       :localdata="goodsSku"
+      ref="skuRef"
+      @add-cart="onAddCart"
+      @buy-now="onBuyNow"
     />
   </template>
 </template>
