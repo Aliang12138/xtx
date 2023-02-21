@@ -1,20 +1,21 @@
+<script setup lang="ts">
+import { useAddressStore } from "@/store/addres";
+import { storeToRefs } from "pinia";
+
+//获取收货地址Store
+const addressStore = useAddressStore();
+const { selectedAddress } = storeToRefs(addressStore);
+</script>
+
 <template>
   <view class="title">配送至</view>
   <view class="shipment">
     <view class="item">
-      <view class="user">李明 13824686868</view>
-      <view class="address">北京市顺义区后沙峪地区安平北街6号院</view>
+      <view class="user"
+        >{{ selectedAddress.receiver }} {{ selectedAddress.contact }}</view
+      >
+      <view class="address">{{ selectedAddress.fullLocation }}</view>
       <text class="icon icon-checked"></text>
-    </view>
-    <view class="item">
-      <view class="user">王东 13824686868</view>
-      <view class="address">北京市顺义区后沙峪地区安平北街6号院</view>
-      <text class="icon icon-ring"></text>
-    </view>
-    <view class="item">
-      <view class="user">张三 13824686868</view>
-      <view class="address">北京市朝阳区孙河安平北街6号院</view>
-      <text class="icon icon-ring"></text>
     </view>
   </view>
   <view class="footer">

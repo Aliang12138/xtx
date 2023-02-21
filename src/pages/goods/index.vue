@@ -16,6 +16,8 @@ import {
   GoodsResult,
 } from "@/apis/goods";
 import { GoodsSku, SkuEvent } from "@/components/vk-data-goods-sku-popup/types";
+import { useAddressStore } from "@/store/addres";
+import { storeToRefs } from "pinia";
 
 const appStore = useAppStore();
 const safeArea = toRef(appStore, "safeArea");
@@ -122,7 +124,19 @@ const onAddCart = async (ev: SkuEvent) => {
   //关闭sku
   isShowSku.value = false;
 };
-const onBuyNow = (ev: SkuEvent) => {};
+
+//获取收货地址Store
+const addressStore = useAddressStore();
+const { selectedAddress } = storeToRefs(addressStore);
+//立即购买
+const onBuyNow = (ev: SkuEvent) => {
+  const skuId = ev._id;
+  const count = ev.buy_num;
+  const addressId = addressStore.selectedAddress.id;
+  uni.navigateTo({
+    url: `/pages/order/create/index?skuId=${skuId}&count=${count}&addressId=${addressId}`,
+  });
+};
 </script>
 
 <style>
@@ -199,7 +213,10 @@ const onBuyNow = (ev: SkuEvent) => {};
           </view>
           <view @tap="showHalfDialog('shipment')" class="item arrow">
             <text class="label">送至</text>
-            <text class="text ellipsis">北京市顺义区京顺路9号黑马程序员</text>
+            <text class="text ellipsis" v-if="selectedAddress.id">{{
+              selectedAddress.fullLocation
+            }}</text>
+            <text v-else class="text ellipsis">请选择收货地址</text>
           </view>
           <view @tap="showHalfDialog('clause')" class="item arrow">
             <text class="label">服务</text>

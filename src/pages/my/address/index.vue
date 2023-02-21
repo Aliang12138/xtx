@@ -4,19 +4,46 @@ import {
   getMemberAddress,
   MemberAddressItem,
 } from "@/apis/address";
-import { onShow } from "@dcloudio/uni-app";
+import { useAddressStore } from "@/store/addres";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 import { ref } from "vue";
 
 //------------------------------
+//获取收货地址
 const addressList = ref<MemberAddressItem[]>([]);
+// onShow页面显示的时候触发的生命周期钩子（可触发多次）
+// onLoad页面加载的时候触发一次，新增或修改地址成功后，后退回来列表页不会触发第二次列表请求
 onShow(async () => {
   addressList.value = await getMemberAddress();
 });
 
+//点击删除
 const deleteAddressBtn = async (id: string) => {
   await deleteMemberAddressId(id);
   uni.showToast({ title: "删除成功" });
   addressList.value = await getMemberAddress();
+};
+
+//获取收货地址Store
+const addressStore = useAddressStore();
+
+//传统写法 通过onLoad获取参数，在准备响应式数据存储结果以备其他地方使用
+// const fromPage = ref("");
+// onLoad(({ from }) => {
+//   if (from) {
+//     fromPage.value = from;
+//   }
+// });
+// vue3 全平台新增：通过props来获取页面参数的使用方式
+const props = defineProps<{ from: string }>();
+
+//选择收货地址
+const changeAddress = (item: MemberAddressItem) => {
+  if (props.from === "order") {
+    //修改选中的地址
+    addressStore.changeSelectedAddress(item);
+    uni.navigateBack({});
+  }
 };
 </script>
 
@@ -31,7 +58,7 @@ const deleteAddressBtn = async (id: string) => {
             :key="item.id"
             class="swipe-cell"
           >
-            <view class="item">
+            <view class="item" @tap="changeAddress(item)">
               <view class="user">
                 {{ item.receiver }}
                 <text>{{ item.contact }}</text>

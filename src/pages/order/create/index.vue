@@ -1,54 +1,100 @@
 <script setup lang="ts">
-import layer from './layer.vue'
+import {
+  getMemberOrderPre,
+  getMemberOrderPreNow,
+  GetMemberOrderPreResult,
+  postMemberOrder,
+} from "@/apis/order";
+import { useAddressStore } from "@/store/addres";
+import { onLoad } from "@dcloudio/uni-app";
+import { storeToRefs } from "pinia";
+import { ref } from "vue";
+import layer from "./layer.vue";
 
 const payments = [
   {
     id: 1,
-    text: '时间不限 (周一至周日)',
+    text: "时间不限 (周一至周日)",
   },
   {
     id: 2,
-    text: '工作日送 (周一至周五)',
+    text: "工作日送 (周一至周五)",
   },
   {
     id: 3,
-    text: '周末配送 (周六至周日)',
+    text: "周末配送 (周六至周日)",
   },
-]
+];
 
-let paymentShow = $ref(false)
+let paymentShow = $ref(false);
 
 const shipments = [
   {
     id: 1,
-    text: '在线支付',
+    text: "在线支付",
   },
   {
     id: 2,
-    text: '货到付款',
+    text: "货到付款",
   },
-]
+];
 
-let shipmentShow = $ref(false)
+let shipmentShow = $ref(false);
 
-let payment = $ref(payments[0])
-let shipment = $ref(shipments[0])
+let payment = $ref(payments[0]);
+let shipment = $ref(shipments[0]);
 
 const getPaymentInfo = (info: any) => {
-  paymentShow = false
-  payment = info
-}
+  paymentShow = false;
+  payment = info;
+};
 
 const getShipmentInfo = (info: any) => {
-  shipmentShow = false
-  shipment = info
-}
+  shipmentShow = false;
+  shipment = info;
+};
 
 const goPayment = () => {
   // uni.navigateTo({
   //   url: '/pages/order/payment/index',
   // })
-}
+};
+
+//-----------------------------\
+//预付订单信息
+const orderPre = ref({} as GetMemberOrderPreResult);
+onLoad(async (data) => {
+  if (data.skuId) {
+    //立即购买
+    orderPre.value = await getMemberOrderPreNow(data as any);
+  } else {
+    //预付
+    orderPre.value = await getMemberOrderPre();
+  }
+});
+
+//获取收货地址Store
+const addressStore = useAddressStore();
+const { selectedAddress } = storeToRefs(addressStore);
+
+const submitForm = async () => {
+  const addressId = selectedAddress.value.id;
+  if (!addressId) {
+    return uni.showToast({ icon: "none", title: "请选择收货地址" });
+  }
+  const { id } = await postMemberOrder({
+    goods: orderPre.value.goods.map((v) => ({
+      skuId: v.skuId,
+      count: v.count,
+    })),
+    addressId,
+    deliveryTimeType: 1,
+    payType: 1,
+    payChannel: 2,
+    buyerMessage: "",
+  });
+  uni.navigateTo({ url: `/pages/order/detail?id=${id}` });
+};
 </script>
 
 <template>
@@ -57,51 +103,50 @@ const goPayment = () => {
     <navigator
       class="shipment"
       hover-class="none"
-      url="/pages/my/address/index"
+      url="/pages/my/address/index?from=order"
+      v-if="selectedAddress.id"
     >
-      <view class="user">李明 13824686868</view>
-      <view class="address">北京市顺义区后沙峪地区安平北街6号院</view>
+      <view class="user"
+        >{{ selectedAddress.receiver }} {{ selectedAddress.contact }}</view
+      >
+      <view class="address"
+        >{{ selectedAddress.fullLocation }}{{ selectedAddress.address }}</view
+      >
+      <text class="icon icon-right"></text>
+    </navigator>
+    <navigator
+      class="shipment"
+      hover-class="none"
+      url="/pages/my/address/index?from=order"
+      v-else
+    >
+      <view class="address">请选择收货地址</view>
       <text class="icon icon-right"></text>
     </navigator>
 
     <!-- 商品信息 -->
     <view class="goods">
-      <view class="item">
-        <image
-          class="cover"
-          src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_7.jpg"
-        ></image>
+      <navigator
+        v-for="item in orderPre.goods"
+        :key="item.skuId"
+        :url="`/pages/goods/index?id=${item.id}`"
+        class="item"
+      >
+        <image class="cover" :src="item.picture"></image>
         <view class="meta">
-          <view class="name ellipsis"
-            >康尔贝 非接触式红外体温仪 领券立减30元 婴儿级材质 测温 康尔贝
-            非接触式红外体温仪</view
-          >
-          <view class="type">白色 全自动充电</view>
+          <view class="name ellipsis">{{ item.name }}</view>
+          <view class="type">{{ item.attrsText }}</view>
           <view class="price">
-            <view class="actual"> <text class="symbol">¥</text>129.04 </view>
-            <view class="original"> <text class="symbol">¥</text>129.04 </view>
+            <view class="actual">
+              <text class="symbol">¥</text>{{ item.payPrice }}</view
+            >
+            <view class="original">
+              <text class="symbol">¥</text>{{ item.price }}
+            </view>
           </view>
-          <view class="quantity">x1</view>
+          <view class="quantity">x{{ item.count }}</view>
         </view>
-      </view>
-      <view class="item">
-        <image
-          class="cover"
-          src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_6.jpg"
-        ></image>
-        <view class="meta">
-          <view class="name ellipsis"
-            >康尔贝 非接触式红外体温仪 领券立减30元 婴儿级材质 测温 康尔贝
-            非接触式红外体温仪</view
-          >
-          <view class="type">白色 全自动充电</view>
-          <view class="price">
-            <view class="actual"> <text class="symbol">¥</text>129.04 </view>
-            <view class="original"> <text class="symbol">¥</text>129.04 </view>
-          </view>
-          <view class="quantity">x1</view>
-        </view>
-      </view>
+      </navigator>
     </view>
 
     <!-- 配送及支付方式 -->
@@ -124,15 +169,22 @@ const goPayment = () => {
     <view class="settlement">
       <view class="item">
         <text class="text">商品总价: </text>
-        <text class="number"> <text class="symbol">¥</text>129.04 </text>
+        <text class="number">
+          <text class="symbol">¥</text>{{ orderPre.summary?.totalPrice }}</text
+        >
       </view>
       <view class="item">
         <text class="text">运费: </text>
-        <text class="number"> <text class="symbol">¥</text>10.00 </text>
+        <text class="number">
+          <text class="symbol">¥</text>{{ orderPre.summary?.postFee }}</text
+        >
       </view>
-      <view class="item">
+      <view class="item" v-if="orderPre.summary?.discountPrice > 0">
         <text class="text">折扣: </text>
-        <text class="number danger"> <text class="symbol">-¥</text>30.00 </text>
+        <text class="number danger">
+          <text class="symbol">-¥</text
+          >{{ orderPre.summary?.discountPrice }}</text
+        >
       </view>
     </view>
     <view class="gap"></view>
@@ -141,10 +193,10 @@ const goPayment = () => {
   <view class="toolbar">
     <view class="amount">
       <text class="symbol">¥</text>
-      <text class="number">266</text>
-      <text class="decimal">.00</text>
+      <text class="number">{{ orderPre.summary?.totalPayPrice }}</text>
+      <!-- <text class="decimal">.00</text> -->
     </view>
-    <view @tap="goPayment" class="button">提交订单</view>
+    <view @tap="submitForm" class="button">提交订单</view>
   </view>
 
   <uni-popup
@@ -394,7 +446,7 @@ page {
 }
 
 .related .picker::after {
-  content: '\e6c2';
+  content: "\e6c2";
 }
 
 /* 结算清单 */

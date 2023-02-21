@@ -1,27 +1,40 @@
 <script setup lang="ts">
-import { toRefs, getCurrentInstance } from 'vue'
-import { onReady } from '@dcloudio/uni-app'
-import useAppStore from '@/store'
-import guess from '@/components/guess/index.vue'
+import { toRefs, getCurrentInstance, ref } from "vue";
+import { onLoad, onReady } from "@dcloudio/uni-app";
+import useAppStore from "@/store";
+import guess from "@/components/guess/index.vue";
+import {
+  getMemberOrderById,
+  GetMemberOrderByIdResult,
+  OrderState,
+} from "@/apis/order";
 
-const appStore = useAppStore()
-const { safeArea, platform } = toRefs(appStore)
+const appStore = useAppStore();
+const { safeArea, platform } = toRefs(appStore);
 
-const pageInstance: any = getCurrentInstance()
+const pageInstance: any = getCurrentInstance();
 
 onReady(() => {
   pageInstance.ctx.$scope.animate(
-    '.navbar .title',
+    ".navbar .title",
     [{ opacity: 0 }, { opacity: 1 }],
     600,
     {
-      scrollSource: '#scrollView',
+      scrollSource: "#scrollView",
       timeRange: 600,
       startScrollOffset: 0,
       endScrollOffset: 120,
-    },
-  )
-})
+    }
+  );
+});
+
+//-----------------------------------
+const order = ref({} as GetMemberOrderByIdResult);
+onLoad(async ({ id }) => {
+  if (id) {
+    order.value = await getMemberOrderById(id);
+  }
+});
 </script>
 
 <template>
@@ -41,16 +54,33 @@ onReady(() => {
   >
     <!-- 订单状态 -->
     <view class="overview" :style="{ paddingTop: safeArea!.top + 40 + 'px' }">
-      <view class="status icon-clock">等待付款</view>
-      <view class="tips">
-        <text>应付金额: ¥90:00</text>
-        <text class="countdown">支付剩余23时57分42秒</text>
-      </view>
-      <view class="button">去支付</view>
+      <template v-if="order.orderState === OrderState['待付款']">
+        <view class="status icon-clock">等待付款</view>
+        <view class="tips">
+          <text>应付金额: ¥90:00</text>
+          <text class="countdown">支付剩余23时57分42秒</text>
+        </view>
+        <view class="button">去支付</view>
+      </template>
+      <template v-if="order.orderState === OrderState['已取消']">
+        <view class="status icon-clock">已取消</view>
+      </template>
+      <template v-if="order.orderState === OrderState['已完成']">
+        <view class="status icon-clock">已完成</view>
+      </template>
+      <template v-if="order.orderState === OrderState['待发货']">
+        <view class="status icon-clock">待发货</view>
+      </template>
+      <template v-if="order.orderState === OrderState['待收货']">
+        <view class="status icon-clock">待收货</view>
+      </template>
+      <template v-if="order.orderState === OrderState['待评价']">
+        <view class="status icon-clock">待评价</view>
+      </template>
     </view>
 
     <!-- 配送状态 -->
-    <view class="shipment">
+    <view class="shipment" v-if="order.orderState === OrderState['待收货']">
       <!-- 物流信息 -->
       <navigator
         class="logistics"
@@ -72,103 +102,32 @@ onReady(() => {
     <!-- 商品信息 -->
     <view class="goods">
       <view class="item">
-        <navigator hover-class="none">
-          <image
-            class="cover"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_7.jpg"
-          ></image>
+        <navigator v-for="item in order.skus" :key="item.id" hover-class="none">
+          <image class="cover" :src="item.image"></image>
           <view class="meta">
-            <view class="name ellipsis"
-              >康尔贝 非接触式红外体温仪 领券立减30元 婴儿级材质 测温 康尔贝
-              非接触式红外体温仪</view
-            >
-            <view class="type">白色 全自动充电</view>
+            <view class="name ellipsis">{{ item.name }}</view>
+            <view class="type">{{ item.attrsText }}</view>
             <view class="price">
               <view class="original">
                 <text class="symbol">¥</text>
-                <text>129</text>
-                <text>.04</text>
+                <text>{{ item.curPrice }}</text>
               </view>
               <view class="actual">
                 <text class="text">实付: </text>
                 <text class="symbol">¥</text>
-                <text>129</text>
-                <text>.04</text>
+                <text>{{ item.realPay }}</text>
               </view>
             </view>
-            <view class="quantity">x1</view>
+            <view class="quantity">x{{ item.quantity }}</view>
           </view>
         </navigator>
         <view class="action">
-          <view class="button primary">申请售后</view>
-          <navigator url="/pages/comments/publish/index" class="button"
-            >去评价</navigator
+          <view
+            v-if="order.orderState === OrderState['已完成']"
+            class="button primary"
+            >申请售后</view
           >
-        </view>
-      </view>
-      <view class="item">
-        <navigator hover-class="none">
-          <image
-            class="cover"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_6.jpg"
-          ></image>
-          <view class="meta">
-            <view class="name ellipsis"
-              >康尔贝 非接触式红外体温仪 领券立减30元 婴儿级材质 测温 康尔贝
-              非接触式红外体温仪</view
-            >
-            <view class="type">白色 全自动充电</view>
-            <view class="price">
-              <view class="original">
-                <text class="symbol">¥</text>
-                <text>129</text>
-                <text>.04</text>
-              </view>
-              <view class="actual">
-                <text class="text">实付: </text>
-                <text class="symbol">¥</text>
-                <text>129</text>
-                <text>.04</text>
-              </view>
-            </view>
-            <view class="quantity">x1</view>
-          </view>
-        </navigator>
-      </view>
-      <view class="item">
-        <navigator hover-class="none">
-          <image
-            class="cover"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/goods_big_5.jpg"
-          ></image>
-          <view class="meta">
-            <view class="name ellipsis"
-              >康尔贝 非接触式红外体温仪 领券立减30元 婴儿级材质 测温 康尔贝
-              非接触式红外体温仪</view
-            >
-            <view class="type">白色 全自动充电</view>
-            <view class="price">
-              <view class="original">
-                <text class="symbol">¥</text>
-                <text>129</text>
-                <text>.04</text>
-              </view>
-              <view class="actual">
-                <text class="text">实付: </text>
-                <text class="symbol">¥</text>
-                <text>129</text>
-                <text>.04</text>
-              </view>
-            </view>
-            <view class="quantity">x1</view>
-          </view>
-        </navigator>
-        <view class="action">
-          <view class="button primary">申请售后</view>
-          <navigator
-            class="button"
-            hover-class="none"
-            url="/pages/comments/publish/index"
+          <navigator url="/pages/comments/publish/index" class="button"
             >去评价</navigator
           >
         </view>
@@ -382,8 +341,8 @@ page {
   top: 50%;
 
   transform: translateY(-50%);
-  content: '\e6c2';
-  font-family: 'erabbit' !important;
+  content: "\e6c2";
+  font-family: "erabbit" !important;
   font-size: 32rpx;
   color: #666;
 }
@@ -518,7 +477,7 @@ page {
 }
 
 .goods .total .symbol::before {
-  content: '¥';
+  content: "¥";
   font-size: 20rpx;
 }
 
