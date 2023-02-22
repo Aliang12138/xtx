@@ -21,6 +21,7 @@ specifiers:
   '@types/wechat-miniprogram': ^3.4.1
   commitizen: ^4.2.4
   cz-conventional-changelog: ^3.3.0
+  dayjs: ^1.11.7
   husky: ^8.0.0
   pinia: ^2.0.14
   pinia-plugin-persistedstate: ^3.0.2
@@ -45,6 +46,7 @@ dependencies:
   '@dcloudio/uni-mp-weixin': 3.0.0-alpha-3041020220516002_vue@3.2.40
   '@dcloudio/uni-quickapp-webview': 3.0.0-alpha-3041020220516002_vue@3.2.40
   '@dcloudio/uni-ui': 1.4.22
+  dayjs: registry.npmmirror.com/dayjs/1.11.7
   pinia: 2.0.23_bfjwoga25wxjazzogo7o372nwq
   pinia-plugin-persistedstate: registry.npmmirror.com/pinia-plugin-persistedstate/3.0.2_pinia@2.0.23
   vue: 3.2.40
@@ -3513,6 +3515,12 @@ packages:
     os: [linux]
     requiresBuild: true
     optional: true
+
+  registry.npmmirror.com/dayjs/1.11.7:
+    resolution: {integrity: sha512-+Yw9U6YO5TQohxLcIkrXBeY73WP3ejHWVvx8XCk3gxvQDCTEmS48ZrSZCKciI7Bhl/uCMyxYtE9UqRILmFphkQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/dayjs/-/dayjs-1.11.7.tgz}
+    name: dayjs
+    version: 1.11.7
+    dev: false
 
   registry.npmmirror.com/esbuild-android-64/0.14.54:
     resolution: {integrity: sha512-Tz2++Aqqz0rJ7kYBfz+iqyE3QMycD4vk7LBRyWaAVFgFtQ/O8EJOnVmTOiDWYZ/uYzB4kvP+bqejYdVKzE5lAQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/esbuild-android-64/-/esbuild-android-64-0.14.54.tgz}
