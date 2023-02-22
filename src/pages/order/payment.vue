@@ -1,35 +1,35 @@
 <script setup lang="ts">
-import { toRefs, getCurrentInstance } from 'vue'
-import { onReady } from '@dcloudio/uni-app'
+import { toRefs, getCurrentInstance } from "vue";
+import { onReady } from "@dcloudio/uni-app";
 
-import useAppStore from '@/store'
+import useAppStore from "@/store";
 
-import guess from '@/components/guess/index.vue'
+import guess from "@/components/guess/index.vue";
 
 // 获取页面实例
-const pageInstance: any = getCurrentInstance()
+const pageInstance: any = getCurrentInstance();
 
-const appStore = useAppStore()
-const { safeArea, platform } = toRefs(appStore)
+const appStore = useAppStore();
+const { safeArea, platform } = toRefs(appStore);
 
 const goBack = () => {
-  uni.navigateBack({})
-}
+  uni.navigateBack({});
+};
 
 onReady(() => {
   // 关键帧动画
   pageInstance.ctx.$scope.animate(
-    '.navbar .title',
+    ".navbar .title",
     [{ opacity: 0 }, { opacity: 1 }],
     600,
     {
-      scrollSource: '#scrollView',
+      scrollSource: "#scrollView",
       timeRange: 600,
       startScrollOffset: 0,
       endScrollOffset: 200,
-    },
-  )
-})
+    }
+  );
+});
 </script>
 
 <template>
@@ -54,7 +54,7 @@ onReady(() => {
         <navigator hover-class="none" class="button" url="/pages/index/index"
           >返回首页</navigator
         >
-        <navigator hover-class="none" url="/pages/order/detail/index"
+        <navigator hover-class="none" url="/pages/order/index"
           >查看订单</navigator
         >
       </view>

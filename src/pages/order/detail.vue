@@ -67,12 +67,12 @@ const orderPay = async () => {
 
     uni.showToast({ title: "支付成功" });
     setTimeout(() => {
-      uni.navigateTo({ url: "pages/order/payment" });
+      uni.navigateTo({ url: "/pages/order/payment" });
     }, 1000);
   } catch (error) {
     uni.showToast({ icon: "error", title: "支付失败" });
     setTimeout(() => {
-      uni.navigateTo({ url: "pages/order/index" });
+      uni.navigateTo({ url: "/pages/order/index" });
     }, 1000);
   }
 };
