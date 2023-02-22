@@ -9,6 +9,10 @@ import {
   OrderState,
 } from "@/apis/order";
 
+// 解构出unix方法
+import { unix } from "dayjs";
+import { getPayMock, getPayWxPayMiniPay } from "@/apis/pay";
+
 const appStore = useAppStore();
 const { safeArea, platform } = toRefs(appStore);
 
@@ -33,8 +37,45 @@ const order = ref({} as GetMemberOrderByIdResult);
 onLoad(async ({ id }) => {
   if (id) {
     order.value = await getMemberOrderById(id);
+    if (order.value.orderState === OrderState["待付款"]) {
+      //开启定时器
+      let timerId = setInterval(() => {
+        //秒数减少
+        order.value.countdown--;
+        //如果倒计时结束
+        if (order.value.countdown < 0) {
+          //清理定时器
+          clearInterval(timerId);
+          //本地更新订单状态
+          order.value.orderState = OrderState["已取消"];
+        }
+      }, 1000);
+    }
   }
 });
+
+//支付订单
+const orderPay = async () => {
+  try {
+    //真正支付的api
+    // const payInfo = await getPayWxPayMiniPay(order.value.id);
+    // //调用微信支付api
+    // await wx.requestPayment(payInfo);
+
+    //模拟接口
+    await getPayMock(order.value.id);
+
+    uni.showToast({ title: "支付成功" });
+    setTimeout(() => {
+      uni.navigateTo({ url: "pages/order/payment" });
+    }, 1000);
+  } catch (error) {
+    uni.showToast({ icon: "error", title: "支付失败" });
+    setTimeout(() => {
+      uni.navigateTo({ url: "pages/order/index" });
+    }, 1000);
+  }
+};
 </script>
 
 <template>
@@ -57,10 +98,12 @@ onLoad(async ({ id }) => {
       <template v-if="order.orderState === OrderState['待付款']">
         <view class="status icon-clock">等待付款</view>
         <view class="tips">
-          <text>应付金额: ¥90:00</text>
-          <text class="countdown">支付剩余23时57分42秒</text>
+          <text>应付金额: ¥{{ order.payMoney }}</text>
+          <text class="countdown"
+            >支付剩余{{ unix(order.countdown).format("mm分ss秒") }}</text
+          >
         </view>
-        <view class="button">去支付</view>
+        <view @tap="orderPay" class="button">去支付</view>
       </template>
       <template v-if="order.orderState === OrderState['已取消']">
         <view class="status icon-clock">已取消</view>
@@ -136,15 +179,15 @@ onLoad(async ({ id }) => {
       <view class="total">
         <view class="row">
           <view class="text">商品总价: </view>
-          <view class="symbol">129.04</view>
+          <view class="symbol">{{ order.totalMoney }}</view>
         </view>
         <view class="row">
           <view class="text">运费: </view>
-          <view class="symbol">10.00</view>
+          <view class="symbol">{{ order.postFee }}</view>
         </view>
         <view class="row paid">
           <view class="text">实付: </view>
-          <view class="symbol primary">139.04</view>
+          <view class="symbol primary">{{ order.payMoney }}</view>
         </view>
       </view>
     </view>
@@ -153,8 +196,8 @@ onLoad(async ({ id }) => {
     <view class="detail">
       <view class="title">订单信息</view>
       <view class="row">
-        <view>订单编号: 838558731208</view>
-        <view>下单时间: 2020-12-12 23:59:59</view>
+        <view>订单编号: {{ order.id }}</view>
+        <view>下单时间: {{ order.createTime }}</view>
         <view>支付方式: 在线支付</view>
         <view>支付渠道: 微信支付</view>
       </view>
@@ -165,7 +208,7 @@ onLoad(async ({ id }) => {
   </scroll-view>
 
   <view class="toobar">
-    <view class="primary">去支付</view>
+    <view @tap="orderPay" class="primary">去支付</view>
     <view class="default">取消订单</view>
   </view>
 
