@@ -5,6 +5,7 @@ import {
   PostMemberAddressData,
   putMemberAddress,
 } from "@/apis/address";
+import { Rules, validate } from "@/utils/validate";
 import { onLoad } from "@dcloudio/uni-app";
 import { ref, reactive } from "vue";
 
@@ -16,8 +17,22 @@ onLoad(({ id }) => {
 
 //如果是确定字段的表单，可以通过reactive定义响应式数据
 const form = reactive({ isDefault: 0 } as PostMemberAddressData);
+
+// 自定义校验规则
+const rules: Rules = {
+  receiver: [{ required: true, message: "请填写收货人姓名" }],
+  contact: [
+    { required: true, message: "请填写收货人手机号码" },
+    { pattern: /^1\d{10}$/, message: "请填写正确的手机号码" },
+  ],
+  provinceCode: [{ required: true, message: "请选择收货人所在城市" }],
+  address: [{ required: true, message: "请填写详细收货地址" }],
+};
+
 //点击提交表单按钮
 const submitForm = async () => {
+  // 如果表单校验失败，退出函数
+  if (!validate(form, rules)) return;
   //如果有id调用修改没有就调用添加
   if (addressId.value) {
     await putMemberAddress(addressId.value, form);
@@ -54,10 +69,10 @@ const isDefaultChange = (ev: WechatMiniprogram.SwitchChange | Event) => {
 
 //页面加载时获取id
 const addressId = ref("");
-onLoad(({ id }) => {
+onLoad(async ({ id }) => {
   if (id) {
     addressId.value = id;
-    const res = getMemberAddressId(id);
+    const res = await getMemberAddressId(id);
     Object.assign(form, res);
   }
 });
